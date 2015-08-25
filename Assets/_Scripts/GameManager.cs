@@ -135,33 +135,27 @@ public class GameManager : MonoBehaviour
     {
         int x = JSONO.GetField("item").Count;
         itemList = new GameObject[x];
-        string name = "";
-        string png = "";
-        string effect = "";
-        string comment = "";
-        int gold = 0;
-        int cure = 0;
         for (int i = 0; i < x; i++)
         {
+            Item item = new Item();
             GameObject newItem = Instantiate(ListItem);
-            newItem.transform.SetParent(dataList.transform);
-            newItem.transform.localScale = new Vector3(1, 1, 1);
+            newItem.transform.SetParent(dataList.transform, false);
             newItem.name = "item" + i.ToString();
-            JSONO.GetField("item")[i].GetField(ref name, "name");
-            JSONO.GetField("item")[i].GetField(ref png, "png");
-            JSONO.GetField("item")[i].GetField(ref effect, "effect");
-            JSONO.GetField("item")[i].GetField(ref gold, "gold");
-            JSONO.GetField("item")[i].GetField(ref cure, "cure");
-            JSONO.GetField("item")[i].GetField(ref comment, "comment");
-            string text_desc = name + "\n" + comment;
+            JSONO.GetField("item")[i].GetField(ref item.name, "name");
+            JSONO.GetField("item")[i].GetField(ref item.png, "png");
+            JSONO.GetField("item")[i].GetField(ref item.effect, "effect");
+            JSONO.GetField("item")[i].GetField(ref item.gold, "gold");
+            JSONO.GetField("item")[i].GetField(ref item.cure, "cure");
+            JSONO.GetField("item")[i].GetField(ref item.comment, "comment");
+            string text_desc = item.name + "\n" + item.comment;
             int currentCount = 0;
-            string text_info = "数量 " + currentCount.ToString() + "\n" + gold.ToString() + " G";
-            Text Text_desc = GameObject.Find(newItem.name + "/Text_desc").GetComponent<Text>();
+            string text_info = "数量 " + currentCount.ToString() + "\n" + item.gold.ToString() + " G";
+            Text Text_desc = newItem.transform.Find("Text_desc").GetComponent<Text>();
             Text_desc.text = text_desc;
-            Text Text_info = GameObject.Find(newItem.name + "/Text_info").GetComponent<Text>();
+            Text Text_info = newItem.transform.Find("Text_info").GetComponent<Text>();
             Text_info.text = text_info;
-            Image IconImage = GameObject.Find(newItem.name + "/Icon/Image").GetComponent<Image>();
-            Sprite Icon = Resources.Load<Sprite>(png);
+            Image IconImage = newItem.transform.Find("Icon/Image").GetComponent<Image>();
+            Sprite Icon = Resources.Load<Sprite>(item.png);
             IconImage.sprite = Icon;
             IconImage.preserveAspect = true;
             itemList[i] = newItem;
@@ -466,6 +460,13 @@ public class GameManager : MonoBehaviour
                     createJobList();
                 }
                 addItemToList(jobList);
+                break;
+
+            case "enemy":
+                if (enemyList == null)
+                {
+                    createEnemyList();
+                }
                 break;
 
             default:

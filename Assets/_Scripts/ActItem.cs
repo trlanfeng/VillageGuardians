@@ -132,6 +132,16 @@ public class ActItem
     }
 }
 
+public class Player
+{
+    public int gold;
+    public int item1Count;
+    public int item2Count;
+    public int item3Count;
+    public int item4Count;
+    public int item5Count;
+}
+
 public class Enemy
 {
     public string name;
@@ -171,5 +181,6 @@ public class Item
     public int gold = 0;
     public int cure = 0;
     public int count = 0;
+    public GameObject GameObject;
 }
 

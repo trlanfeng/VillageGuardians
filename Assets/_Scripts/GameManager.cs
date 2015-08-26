@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    Player player;
+
     //获取各组件的 RectTransform 方便进行设置
     public RectTransform PanelList;
 
@@ -35,8 +37,7 @@ public class GameManager : MonoBehaviour
     public GameObject showList;
 
     //定义存储
-    private GameObject[] itemList;
-
+    private Item[] itemList;
     private GameObject[] equipmentList;
     private GameObject[] magicList;
     private GameObject[] jobList;
@@ -50,8 +51,18 @@ public class GameManager : MonoBehaviour
     public GameObject Fight;
     public GameObject Canvas;
 
+    enum ItemType
+    {
+        Item,
+        Equipment,
+        Magic,
+        Job
+    }
+
     private void Awake()
     {
+        player = new Player();
+        player.gold = 10000;
         TextAsset dataFile = Resources.Load("dataFile") as TextAsset;
         dataJSON = dataFile.text;
         JSONO = new JSONObject(dataJSON);
@@ -64,7 +75,6 @@ public class GameManager : MonoBehaviour
         Village.SetActive(true);
         Fight = Canvas.transform.Find("Panel_Fight").gameObject;
         Fight.SetActive(false);
-        //createEnemyList();
     }
 
     private void Start()
@@ -134,13 +144,20 @@ public class GameManager : MonoBehaviour
     public void createItemList()
     {
         int x = JSONO.GetField("item").Count;
-        itemList = new GameObject[x];
+        itemList = new Item[x];
         for (int i = 0; i < x; i++)
         {
             Item item = new Item();
             GameObject newItem = Instantiate(ListItem);
             newItem.transform.SetParent(dataList.transform, false);
             newItem.name = "item" + i.ToString();
+            Button btn = newItem.GetComponent<Button>();
+            int index = i;
+            btn.onClick.AddListener(() =>
+            {
+                buy(ItemType.Item, index);
+            });
+            item.GameObject = newItem;
             JSONO.GetField("item")[i].GetField(ref item.name, "name");
             JSONO.GetField("item")[i].GetField(ref item.png, "png");
             JSONO.GetField("item")[i].GetField(ref item.effect, "effect");
@@ -158,7 +175,29 @@ public class GameManager : MonoBehaviour
             Sprite Icon = Resources.Load<Sprite>(item.png);
             IconImage.sprite = Icon;
             IconImage.preserveAspect = true;
-            itemList[i] = newItem;
+            itemList[i] = item;
+        }
+    }
+
+    private void buy(ItemType it, int index)
+    {
+        switch (it)
+        {
+            case ItemType.Item:
+                if (player.gold >= itemList[index].gold)
+                {
+                    itemList[index].count += 1;
+                    player.gold -= itemList[index].gold;
+                }
+                break;
+            case ItemType.Equipment:
+                break;
+            case ItemType.Magic:
+                break;
+            case ItemType.Job:
+                break;
+            default:
+                break;
         }
     }
 
@@ -435,7 +474,10 @@ public class GameManager : MonoBehaviour
                 {
                     createItemList();
                 }
-                addItemToList(itemList);
+                foreach (var item in itemList)
+                {
+                    addItemToList(item.GameObject);
+                }
                 break;
 
             case "equipment":
@@ -482,9 +524,12 @@ public class GameManager : MonoBehaviour
         int y = list.Length;
         for (int i = 0; i < y; i++)
         {
-            list[i].transform.SetParent(showList.transform);
-            list[i].transform.localScale = new Vector3(1, 1, 1);
+            list[i].transform.SetParent(showList.transform, false);
         }
+    }
+    public void addItemToList(GameObject go)
+    {
+        go.transform.SetParent(showList.transform, false);
     }
 
     public void removeItemToData()

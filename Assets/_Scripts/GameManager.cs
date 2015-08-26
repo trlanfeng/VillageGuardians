@@ -165,8 +165,7 @@ public class GameManager : MonoBehaviour
             JSONO.GetField("item")[i].GetField(ref item.cure, "cure");
             JSONO.GetField("item")[i].GetField(ref item.comment, "comment");
             string text_desc = item.name + "\n" + item.comment;
-            int currentCount = 0;
-            string text_info = "数量 " + currentCount.ToString() + "\n" + item.gold.ToString() + " G";
+            string text_info = "数量 " + item.count.ToString() + "\n" + item.gold.ToString() + " G";
             Text Text_desc = newItem.transform.Find("Text_desc").GetComponent<Text>();
             Text_desc.text = text_desc;
             Text Text_info = newItem.transform.Find("Text_info").GetComponent<Text>();
@@ -188,6 +187,9 @@ public class GameManager : MonoBehaviour
                 {
                     itemList[index].count += 1;
                     player.gold -= itemList[index].gold;
+                    string text_info = "数量 " + itemList[index].count.ToString() + "\n" + itemList[index].gold.ToString() + " G";
+                    Text Text_info = itemList[index].GameObject.transform.Find("Text_info").GetComponent<Text>();
+                    Text_info.text = text_info;
                 }
                 break;
             case ItemType.Equipment:

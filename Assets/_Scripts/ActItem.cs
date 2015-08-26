@@ -169,6 +169,8 @@ public class Hero
     float coefficientStr;
     float coefficientMag;
     float coefficientDef;
+    int weaponID;
+    int armorID;
 }
 
 public class Item

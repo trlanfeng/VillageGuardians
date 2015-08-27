@@ -51,6 +51,8 @@ public class GameManager : MonoBehaviour
     public GameObject Fight;
     public GameObject Canvas;
 
+    Text Text_Gold;
+
     enum ItemType
     {
         Item,
@@ -75,6 +77,8 @@ public class GameManager : MonoBehaviour
         Village.SetActive(true);
         Fight = Canvas.transform.Find("Panel_Fight").gameObject;
         Fight.SetActive(false);
+        Text_Gold = Village.transform.Find("TopBanner/Text_Gold").GetComponent<Text>();
+        Text_Gold.text = player.gold + " G";
     }
 
     private void Start()
@@ -190,6 +194,7 @@ public class GameManager : MonoBehaviour
                     string text_info = "数量 " + itemList[index].count.ToString() + "\n" + itemList[index].gold.ToString() + " G";
                     Text Text_info = itemList[index].GameObject.transform.Find("Text_info").GetComponent<Text>();
                     Text_info.text = text_info;
+                    Text_Gold.text = player.gold + " G";
                 }
                 break;
             case ItemType.Equipment:

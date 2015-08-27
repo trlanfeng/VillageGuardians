@@ -65,6 +65,7 @@ public class GameManager : MonoBehaviour
     {
         player = new Player();
         player.gold = 10000;
+        
         TextAsset dataFile = Resources.Load("dataFile") as TextAsset;
         dataJSON = dataFile.text;
         JSONO = new JSONObject(dataJSON);
@@ -79,6 +80,8 @@ public class GameManager : MonoBehaviour
         Fight.SetActive(false);
         Text_Gold = Village.transform.Find("TopBanner/Text_Gold").GetComponent<Text>();
         Text_Gold.text = player.gold + " G";
+
+        player.bagSize = 20 + itemList[4].count * 20;
     }
 
     private void Start()
@@ -187,6 +190,15 @@ public class GameManager : MonoBehaviour
         switch (it)
         {
             case ItemType.Item:
+                int itemCount = 0;
+                for (int i = 0; i < itemList.Length - 1; i++)
+                {
+                    itemCount += itemList[i].count;
+                }
+                if (itemCount >= player.bagSize && index != 4)
+                {
+                    return;
+                }
                 if (player.gold >= itemList[index].gold)
                 {
                     itemList[index].count += 1;
@@ -195,6 +207,10 @@ public class GameManager : MonoBehaviour
                     Text Text_info = itemList[index].GameObject.transform.Find("Text_info").GetComponent<Text>();
                     Text_info.text = text_info;
                     Text_Gold.text = player.gold + " G";
+                }
+                if (index == 4)
+                {
+                    player.bagSize = 20 + itemList[4].count * 20;
                 }
                 break;
             case ItemType.Equipment:

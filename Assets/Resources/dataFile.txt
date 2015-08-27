@@ -10,7 +10,7 @@
         { "id": 0, "name": "药草", "png": "images/useItem/herb", "effect": "images/effect/heal1", "gold": 20, "cure": 30, "comment": "治疗 30HP" },
         { "id": 0, "name": "蜂蜜酒", "png": "images/useItem/honey", "effect": "images/effect/heal1", "gold": 50, "cure": 100, "comment": "治疗 100HP" },
         { "id": 0, "name": "Elixir", "png": "images/useItem/elixir", "effect": "images/effect/heal1", "gold": 200, "cure": 500, "comment": "治疗 500HP" },
-        { "id": 0, "name": "扩展背包", "png": "images/useItem/bag", "gold": 300, "cure": 20, "comment": "数量 最大20" }
+        { "id": 0, "name": "扩展背包", "png": "images/useItem/bag", "gold": 300, "cure": 20, "comment": "可容纳20个道具" }
     ],
     "weapon": [
         { "id": 0, "name": "绣了的剑", "png": "images/weapon/rust_sword", "effect": "images/effect/slash1", "gold": 100, "attack": 5, "comment": "攻击 5" },

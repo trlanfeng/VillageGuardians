@@ -38,13 +38,13 @@ public class BattleManager : MonoBehaviour
             ActorList.Add(new ActItem(actorID, playerList[i], 1));
             actorID++;
         }
-        for (int i = 0; i < enemyList.Count; i++)
+        for (int i = 0; i < GM.enemyListGameObject.Count; i++)
         {
-            ActorList.Add(new ActItem(actorID, enemyList[i], -1));
+            ActorList.Add(new ActItem(actorID, GM.enemyListGameObject[i], -1));
             actorID++;
         }
         actTimer = 2f;
-        everyActTime = 3f;
+        everyActTime = 0.5f;
     }
     Button btn;
     // Update is called once per frame
@@ -58,16 +58,12 @@ public class BattleManager : MonoBehaviour
         if (!inAct)
         {
             actTimer += Time.deltaTime;
-            //if (Input.GetMouseButtonUp(0))
-            //{
-            //    turnBase();
-            //}
         }
-        //if (actTimer > everyActTime)
-        //{
-        //    actTimer = 0;
-        //    turnBase();
-        //}
+        if (actTimer > everyActTime)
+        {
+            actTimer = 0;
+            turnBase();
+        }
         if (blinkTotal > 0)
         {
             hertBlink(ActorList[currentActorIndex].GameObject, false);
@@ -94,6 +90,8 @@ public class BattleManager : MonoBehaviour
         trans.DOMoveX(trans.position.x + moveDistance, 0.1f).OnComplete(() =>
         {
             Debug.Log("执行了一次攻击！");
+            ActorList[1].Hp -= ActorList[0].Attack - ActorList[1].Defence;
+            Debug.Log("怪物生命：" + ActorList[1].Hp);
             //让怪物闪烁0.5秒
             blinkTotal = 0.5f;
             trans.DOMoveX(trans.position.x - moveDistance, 0.1f).OnComplete(() =>

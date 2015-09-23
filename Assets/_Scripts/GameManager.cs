@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
@@ -24,7 +25,7 @@ public class GameManager : MonoBehaviour
     public RectTransform PanelMenu;
 
     //定义JSON Object变量
-    private JSONObject JSONO;
+    public JSONObject JSONO;
 
     private string dataJSON;
 
@@ -61,11 +62,12 @@ public class GameManager : MonoBehaviour
         Job
     }
 
-    int level;
+    public int level;
+    public int[][] enemyIDList;
 
     private void Awake()
     {
-        level = 1;
+        level = 0;
         player = new Player();
         player.gold = 10000;
 
@@ -85,6 +87,8 @@ public class GameManager : MonoBehaviour
         Text_Gold.text = player.gold + " G";
 
         player.bagSize = 20 + itemList[4].count * 20;
+
+        generateEnemyList(level);
     }
 
     private void Start()
@@ -434,16 +438,13 @@ public class GameManager : MonoBehaviour
     /// 生成怪物列表
     /// </summary>
     /// <param name="level">第 level 关卡</param>
-	private void generateEnemyList(int level)
+	public void generateEnemyList(int level)
     {
         string enemyListString = "";
         JSONO.GetField("level")[level].GetField(ref enemyListString, "enemy");
-        Debug.LogError("enemyListString:::" + enemyListString);
         //enemyList：存储着需要生成怪物的ID
         string[] enemyList = new string[enemyListString.Split('.').Length];
-
         enemyList = enemyListString.Split('.');
-        Debug.LogError("enemyList.Length:::" + enemyList.Length);
         //共随机多少个怪
         int enemyCount = 0;
         int enemyCountMin = 0;
@@ -474,47 +475,33 @@ public class GameManager : MonoBehaviour
         List<int> enemyColumnList = new List<int>();
         do
         {
-            int t = Random.Range(1, enemyCount);
+            int t = Random.Range(1, columnLastEnemy);
             enemyColumnList.Add(t);
             columnLastEnemy -= t;
         } while (columnLastEnemy > 0);
-        //enemyColumnList是需要生成的怪物的所有数据，接下来根据第二种怪物的几率，对其中的怪物进行计算
-        enemyListGameObject = new List<GameObject>();
-        //changeID：存储需要变为第二个怪物的ID
-        List<int> changedID = new List<int>();
-        do
+        //enemyColumnList是需要生成的怪物的所有数据，是一个列表，列表每一项存储的是当列的怪物个数
+        enemyIDList = new int[enemyColumnList.Count][];
+        for (int i = 0; i < enemyColumnList.Count; i++)
         {
-            int t;
-            do
+            enemyIDList[i] = new int[enemyColumnList[i]];
+        }
+        for (int i = 0; i < enemyIDList.Length; i++)
+        {
+            for (int j = 0; j < enemyIDList[i].Length; j++)
             {
-                t = Random.Range(0, enemyCount - 1);
-            } while (changedID.Contains(t));
-            // enemyListGameObject[t] 改为第二个怪物
-            changedID.Add(t);
-            enemy2Count -= 1;
-        } while (enemy2Count > 0);
-        //得到所有最终需要生成的怪物资料 enemyListGameObject
-        for (int i = 0; i < enemyCount; i++)
-        {
-            Debug.LogError("enemyID:::" + enemyList[0]);
-            string png = "";
-            //JSONO.GetField("level")[level].GetField(ref enemyListString, "enemy");
-            JSONO.GetField("enemy")[int.Parse(enemyList[0])].GetField(ref png, "png");
-            Debug.LogError("png:::" + png);
-            enemyListGameObject.Add(Instantiate(Resources.Load<GameObject>("Enemys/" + enemyList[0])));
-            enemyListGameObject[i].transform.SetParent(Fight.transform.Find("EnemyList"));
-            enemyListGameObject[i].transform.GetComponent<Image>().sprite = Resources.Load<Sprite>(png);
+                float r = Random.Range(0, 1f);
+                if (r < 0.7f && enemy1Count > 0)
+                {
+                    enemyIDList[i][j] = int.Parse(enemyList[0]);
+                    enemy1Count -= 1;
+                }
+                else if (r >= 0.7f && enemy2Count > 0)
+                {
+                    enemyIDList[i][j] = int.Parse(enemyList[1]);
+                    enemy2Count -= 1;
+                }
+            }
         }
-        foreach (var item in changedID)
-        {
-            string png = "";
-            //JSONO.GetField("level")[level].GetField(ref enemyListString, "enemy");
-            JSONO.GetField("enemy")[item].GetField(ref png, "png");
-            enemyListGameObject[item] = Instantiate(Resources.Load<GameObject>("Enemys/" + enemyList[1]));
-            enemyListGameObject[item].transform.SetParent(Fight.transform.Find("EnemyList"));
-            enemyListGameObject[item].transform.GetComponent<Image>().sprite = Resources.Load<Sprite>(png);
-        }
-        //根据 enemyColumnList 进行生成
     }
 
     /// <summary>

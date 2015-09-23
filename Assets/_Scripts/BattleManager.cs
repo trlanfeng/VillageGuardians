@@ -38,11 +38,9 @@ public class BattleManager : MonoBehaviour
             ActorList.Add(new ActItem(actorID, playerList[i], 1));
             actorID++;
         }
-        for (int i = 0; i < GM.enemyListGameObject.Count; i++)
-        {
-            ActorList.Add(new ActItem(actorID, GM.enemyListGameObject[i], -1));
-            actorID++;
-        }
+
+        createEnemys();
+
         actTimer = 2f;
         everyActTime = 0.5f;
     }
@@ -130,7 +128,7 @@ public class BattleManager : MonoBehaviour
     void hertBlink(GameObject go, bool isDead)
     {
         blinkTotal -= Time.deltaTime;
-        Image img = go.GetComponent<Image>();
+        Image img = go.transform.Find("Image").GetComponent<Image>();
         img.color = new Color(img.color.r, img.color.g, img.color.b, blinkTimer);
         if (blinkTimer >= 1)
         {
@@ -160,4 +158,26 @@ public class BattleManager : MonoBehaviour
         }
     }
     #endregion
+
+    int wave = 0;
+    void createEnemys()
+    {
+        
+        int[][] enemys = GM.enemyIDList;
+        Debug.Log("enemyWave:::" + enemys.Length);
+        Debug.Log("enemyCount:::" + enemys[wave].Length);
+        for (int j = 0; j < enemys[wave].Length; j++)
+        {
+            string png = "";
+            GM.JSONO.GetField("enemy")[enemys[wave][j]].GetField(ref png, "png");
+            GameObject go = Instantiate(Resources.Load<GameObject>("Enemys/Enemy"));
+            go.name = "Enemy" + ActorList.Count;
+            go.transform.SetParent(GM.Fight.transform.Find("EnemyList"),false);
+            go.transform.Find("Image").GetComponent<Image>().sprite = Resources.Load<Sprite>(png);
+            go.transform.Find("Image").GetComponent<Image>().SetNativeSize();
+            ActItem ai = new ActItem(ActorList.Count, go, -1);
+            ActorList.Add(ai);
+        }
+        wave += 1;
+    }
 }

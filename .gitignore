@@ -9,3 +9,7 @@ Assets/UnityVS.meta
 *.csproj
 *.unityproj
 *.sln
+/ScriptBackup
+/Assets/UnityVS.meta
+/*.suo
+/VillageGuardians.userprefs

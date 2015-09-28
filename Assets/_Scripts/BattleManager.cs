@@ -13,6 +13,8 @@ public class BattleManager : MonoBehaviour
     public List<GameObject> playerList;
     public List<GameObject> enemyList;
     int actorID;
+    //当前被攻击对象
+    GameObject beHurtGameObject;
 
     public List<ActItem> ActorList;
     //当前是否在行动
@@ -64,7 +66,7 @@ public class BattleManager : MonoBehaviour
         }
         if (blinkTotal > 0)
         {
-            hertBlink(ActorList[currentActorIndex].GameObject, false);
+            hertBlink(beHurtGameObject, false);
         }
     }
     #region 进行一个回合
@@ -79,10 +81,16 @@ public class BattleManager : MonoBehaviour
         Transform trans = ActorList[currentActorIndex].GameObject.transform;
         if (ActorList[currentActorIndex].ActorType == 1)
         {
+            int i = Random.Range(0, enemyList.Count);
+            Debug.Log("id:::"+i);
+            beHurtGameObject = enemyList[i];
             moveDistance = Mathf.Abs(moveDistance);
         }
         else if (ActorList[currentActorIndex].ActorType == -1)
         {
+            int i = Random.Range(0, playerList.Count);
+            Debug.Log("id:::" + i);
+            beHurtGameObject = playerList[i];
             moveDistance = Mathf.Abs(moveDistance) * -1;
         }
         trans.DOMoveX(trans.position.x + moveDistance, 0.1f).OnComplete(() =>
@@ -128,33 +136,41 @@ public class BattleManager : MonoBehaviour
     void hertBlink(GameObject go, bool isDead)
     {
         blinkTotal -= Time.deltaTime;
-        Image img = go.transform.Find("Image").GetComponent<Image>();
-        img.color = new Color(img.color.r, img.color.g, img.color.b, blinkTimer);
-        if (blinkTimer >= 1)
+        if (go != null)
         {
-            timerUp = false;
-        }
-        if (blinkTimer <= 0)
-        {
-            timerUp = true;
-        }
-        if (!timerUp)
-        {
-            blinkTimer -= Time.deltaTime * 50;
+            Image img = go.transform.Find("Image").GetComponent<Image>();
+            img.color = new Color(img.color.r, img.color.g, img.color.b, blinkTimer);
+            if (blinkTimer >= 1)
+            {
+                timerUp = false;
+            }
+            if (blinkTimer <= 0)
+            {
+                timerUp = true;
+            }
+            if (!timerUp)
+            {
+                blinkTimer -= Time.deltaTime * 50;
+            }
+            else
+            {
+                blinkTimer += Time.deltaTime * 50;
+            }
+            if (blinkTotal < 0)
+            {
+                inAct = false;
+                blinkTotal = 0;
+                img.color = new Color(img.color.r, img.color.g, img.color.b, 1);
+            }
+            else
+            {
+                inAct = true;
+            }
         }
         else
-        {
-            blinkTimer += Time.deltaTime * 50;
-        }
-        if (blinkTotal < 0)
         {
             inAct = false;
             blinkTotal = 0;
-            img.color = new Color(img.color.r, img.color.g, img.color.b, 1);
-        }
-        else
-        {
-            inAct = true;
         }
     }
     #endregion
@@ -162,7 +178,7 @@ public class BattleManager : MonoBehaviour
     int wave = 0;
     void createEnemys()
     {
-        
+        enemyList.Clear();
         int[][] enemys = GM.enemyIDList;
         Debug.Log("enemyWave:::" + enemys.Length);
         Debug.Log("enemyCount:::" + enemys[wave].Length);
@@ -172,11 +188,12 @@ public class BattleManager : MonoBehaviour
             GM.JSONO.GetField("enemy")[enemys[wave][j]].GetField(ref png, "png");
             GameObject go = Instantiate(Resources.Load<GameObject>("Enemys/Enemy"));
             go.name = "Enemy" + ActorList.Count;
-            go.transform.SetParent(GM.Fight.transform.Find("EnemyList"),false);
+            go.transform.SetParent(GM.Fight.transform.Find("EnemyList"), false);
             go.transform.Find("Image").GetComponent<Image>().sprite = Resources.Load<Sprite>(png);
             go.transform.Find("Image").GetComponent<Image>().SetNativeSize();
             ActItem ai = new ActItem(ActorList.Count, go, -1);
             ActorList.Add(ai);
+            enemyList.Add(go);
         }
         wave += 1;
     }

@@ -3,29 +3,9 @@ public class ActItem
 {
     private int id;
     private GameObject gameObject;
+    //1为友军，-1为敌军
     private int actorType;
-    private int hp;
-    private int attack;
-    private int defence;
-    private int crit;
-    private int dodge;
-    /// <summary>
-    /// 行动项
-    /// </summary>
-    /// <param name="id">行动项ID</param>
-    /// <param name="gameObject">行动项的GameObject</param>
-    /// <param name="actorType">1为友军，-1为敌军</param>
-    public ActItem(int id, GameObject gameObject, int actorType)
-    {
-        this.id = id;
-        this.gameObject = gameObject;
-        this.actorType = actorType;
-        this.hp = 0;
-        this.attack = 0;
-        this.defence = 0;
-        this.crit = 0;
-        this.dodge = 0;
-    }
+
     public int Id
     {
         get
@@ -65,71 +45,6 @@ public class ActItem
             actorType = value;
         }
     }
-
-    public int Hp
-    {
-        get
-        {
-            return hp;
-        }
-
-        set
-        {
-            hp = value;
-        }
-    }
-
-    public int Attack
-    {
-        get
-        {
-            return attack;
-        }
-
-        set
-        {
-            attack = value;
-        }
-    }
-
-    public int Defence
-    {
-        get
-        {
-            return defence;
-        }
-
-        set
-        {
-            defence = value;
-        }
-    }
-
-    public int Crit
-    {
-        get
-        {
-            return crit;
-        }
-
-        set
-        {
-            crit = value;
-        }
-    }
-
-    public int Dodge
-    {
-        get
-        {
-            return dodge;
-        }
-
-        set
-        {
-            dodge = value;
-        }
-    }
 }
 
 public class Player
@@ -143,7 +58,7 @@ public class Player
     public int item5Count;
 }
 
-public class Enemy
+public class Enemy : ActItem
 {
     public string name;
     public string png;
@@ -152,26 +67,67 @@ public class Enemy
     public int def;
     public int exp;
     public int gold;
+
+    public Enemy()
+    {
+        base.ActorType = -1;
+        HP = 50;
+        str = 10;
+        def = 10;
+        exp = 10;
+        gold = 10;
+    }
+
+    public void setJsonToEnemy(JSONObject jo)
+    {
+        jo.GetField(ref HP, "hp");
+        jo.GetField(ref str, "str");
+        jo.GetField(ref def, "def");
+        jo.GetField(ref exp, "exp");
+        jo.GetField(ref gold, "gold");
+    }
 }
 
-public class Hero
+public class Hero : ActItem
 {
     public string name;
     public string png;
-    int level;
-    int exp;
-    int baseHP;
-    int baseMP;
-    int baseStr;
-    int baseMag;
-    int baseDef;
-    float coefficientHP;
-    float coefficientMP;
-    float coefficientStr;
-    float coefficientMag;
-    float coefficientDef;
-    int weaponID;
-    int armorID;
+    public int level;
+    public int exp;
+    public int HP;
+    public int MP;
+    public int str;
+    public int mag;
+    public int def;
+    public int baseHP;
+    public int baseMP;
+    public int baseStr;
+    public int baseMag;
+    public int baseDef;
+    public float coefficientHP;
+    public float coefficientMP;
+    public float coefficientStr;
+    public float coefficientMag;
+    public float coefficientDef;
+    public int weaponID;
+    public int armorID;
+
+    public Hero()
+    {
+        base.ActorType = 1;
+        level = 1;
+        exp = 0;
+        HP = 100;
+        MP = 100;
+        str = 5;
+        mag = 100;
+        def = 2;
+    }
+
+    public void setJsonToHero(JSONObject jo)
+    {
+
+    }
 }
 
 public class Item

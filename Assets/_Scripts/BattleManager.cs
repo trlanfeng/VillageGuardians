@@ -10,8 +10,8 @@ public class BattleManager : MonoBehaviour
     int currentActorIndex;
     int nextActorIndex;
     //可行动角色列表
-    public List<GameObject> playerList;
-    public List<GameObject> enemyList;
+    private List<Hero> heroList;
+    private List<Enemy> enemyList;
     int actorID;
     //当前被攻击对象
     GameObject beHurtGameObject;
@@ -30,16 +30,22 @@ public class BattleManager : MonoBehaviour
     void Start()
     {
         GM = this.GetComponent<GameManager>();
-
+        heroList = new List<Hero>();
+        enemyList = new List<Enemy>();
         inAct = false;
         actorID = 0;
         currentActorIndex = 0;
         ActorList = new List<ActItem>();
-        for (int i = 0; i < playerList.Count; i++)
-        {
-            ActorList.Add(new ActItem(actorID, playerList[i], 1));
-            actorID++;
-        }
+        //for (int i = 0; i < playerList.Count; i++)
+        //{
+        //    ActorList.Add(new ActItem(actorID, playerList[i], 1));
+        //    actorID++;
+        //}
+        Hero h = new Hero();
+        heroList.Add(h);
+        h.GameObject = GameObject.Find("Canvas").transform.Find("Panel_Fight/HeroList/Hero1").gameObject;
+        ActorList.Add(h as ActItem);
+        actorID++;
 
         createEnemys();
 
@@ -79,26 +85,50 @@ public class BattleManager : MonoBehaviour
         }
         inAct = true;
         Transform trans = ActorList[currentActorIndex].GameObject.transform;
+        int attacker = -1;
+        int defencer = -1;
         if (ActorList[currentActorIndex].ActorType == 1)
         {
             int i = Random.Range(0, enemyList.Count);
+            attacker = currentActorIndex;
+            defencer = i;
             Debug.Log("id:::"+i);
-            beHurtGameObject = enemyList[i];
+            beHurtGameObject = enemyList[i].GameObject;
             moveDistance = Mathf.Abs(moveDistance);
+            Debug.Log("执行了一次攻击！");
+            int beHurtHP = heroList[attacker].str - enemyList[defencer].def;
+            if (beHurtHP > 0)
+            {
+                enemyList[defencer].HP = enemyList[defencer].HP - beHurtHP;
+                Debug.Log("被攻击者的生命：" + enemyList[defencer].HP);
+            }
+            else
+            {
+                Debug.Log("未破防");
+            }
         }
         else if (ActorList[currentActorIndex].ActorType == -1)
         {
-            int i = Random.Range(0, playerList.Count);
+            int i = Random.Range(0, heroList.Count);
+            attacker = currentActorIndex - heroList.Count;
+            defencer = i;
             Debug.Log("id:::" + i);
-            beHurtGameObject = playerList[i];
+            beHurtGameObject = heroList[i].GameObject;
             moveDistance = Mathf.Abs(moveDistance) * -1;
+            Debug.Log("执行了一次攻击！");
+            int beHurtHP = enemyList[attacker].str - heroList[defencer].def;
+            if (beHurtHP > 0)
+            {
+                heroList[defencer].HP = heroList[defencer].HP - beHurtHP;
+                Debug.Log("被攻击者的生命：" + heroList[defencer].HP);
+            }
+            else
+            {
+                Debug.Log("未破防");
+            }
         }
         trans.DOMoveX(trans.position.x + moveDistance, 0.1f).OnComplete(() =>
         {
-            Debug.Log("执行了一次攻击！");
-            ActorList[1].Hp -= ActorList[0].Attack - ActorList[1].Defence;
-            Debug.Log("怪物生命：" + ActorList[1].Hp);
-            //让怪物闪烁0.5秒
             blinkTotal = 0.5f;
             trans.DOMoveX(trans.position.x - moveDistance, 0.1f).OnComplete(() =>
             {
@@ -191,9 +221,11 @@ public class BattleManager : MonoBehaviour
             go.transform.SetParent(GM.Fight.transform.Find("EnemyList"), false);
             go.transform.Find("Image").GetComponent<Image>().sprite = Resources.Load<Sprite>(png);
             go.transform.Find("Image").GetComponent<Image>().SetNativeSize();
-            ActItem ai = new ActItem(ActorList.Count, go, -1);
-            ActorList.Add(ai);
-            enemyList.Add(go);
+            Enemy e = new Enemy();
+            e.setJsonToEnemy(GM.JSONO.GetField("enemy")[enemys[wave][j]]);
+            e.GameObject = go;
+            ActorList.Add(e as ActItem);
+            enemyList.Add(e);
         }
         wave += 1;
     }

@@ -19,6 +19,8 @@ public class BattleManager : MonoBehaviour
     public List<ActItem> ActorList;
     //当前是否在行动
     bool inAct;
+    //是否战斗结束
+    bool isEnd;
     //行动计时器
     float actTimer;
     //每回合行动时间
@@ -33,6 +35,7 @@ public class BattleManager : MonoBehaviour
         heroList = new List<Hero>();
         enemyList = new List<Enemy>();
         inAct = false;
+        isEnd = false;
         actorID = 0;
         currentActorIndex = 0;
         ActorList = new List<ActItem>();
@@ -61,7 +64,7 @@ public class BattleManager : MonoBehaviour
             return;
         }
         fixActorIndex();
-        if (!inAct)
+        if (!inAct && !isEnd)
         {
             actTimer += Time.deltaTime;
         }
@@ -220,12 +223,12 @@ public class BattleManager : MonoBehaviour
     {
         enemyList.Clear();
         int[][] enemys = GM.enemyIDList;
-        if (wave > enemys.Length)
+        if (wave >= enemys.Length)
         {
+            isEnd = true;
             return;
         }
         Debug.Log("enemyWave:::" + enemys.Length);
-
         for (int i = 0; i < enemys.Length; i++)
         {
             Debug.Log("enemyWave:::" + i + ":::" + enemys[i].Length);

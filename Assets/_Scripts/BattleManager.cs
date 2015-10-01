@@ -92,7 +92,7 @@ public class BattleManager : MonoBehaviour
             int i = Random.Range(0, enemyList.Count);
             attacker = currentActorIndex;
             defencer = i;
-            Debug.Log("id:::"+i);
+            Debug.Log("id:::" + i);
             beHurtGameObject = enemyList[i].GameObject;
             moveDistance = Mathf.Abs(moveDistance);
             Debug.Log("执行了一次攻击！");
@@ -101,6 +101,16 @@ public class BattleManager : MonoBehaviour
             {
                 enemyList[defencer].HP = enemyList[defencer].HP - beHurtHP;
                 Debug.Log("被攻击者的生命：" + enemyList[defencer].HP);
+                if (enemyList[defencer].HP <= 0)
+                {
+                    GameObject.Destroy(enemyList[defencer].GameObject);
+                    enemyList.RemoveAt(defencer);
+                    ActorList.RemoveAt(defencer + heroList.Count);
+                    if (enemyList.Count == 0)
+                    {
+                        createEnemys();
+                    }
+                }
             }
             else
             {
@@ -210,8 +220,16 @@ public class BattleManager : MonoBehaviour
     {
         enemyList.Clear();
         int[][] enemys = GM.enemyIDList;
+        if (wave > enemys.Length)
+        {
+            return;
+        }
         Debug.Log("enemyWave:::" + enemys.Length);
-        Debug.Log("enemyCount:::" + enemys[wave].Length);
+
+        for (int i = 0; i < enemys.Length; i++)
+        {
+            Debug.Log("enemyWave:::" + i + ":::" + enemys[i].Length);
+        }
         for (int j = 0; j < enemys[wave].Length; j++)
         {
             string png = "";

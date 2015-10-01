@@ -466,7 +466,7 @@ public class GameManager : MonoBehaviour
         }
         enemyCount = Random.Range(enemyCountMin, enemyCountMax);
         //第一个随机70%-100%的几率，第一个怪物的数量
-        int enemy1Count = Random.Range(70, 100) * enemyCount;
+        int enemy1Count = Mathf.RoundToInt(Random.Range(0.7f, 1f) * enemyCount);
         //第二个取1减掉第一个的百分比几率再乘以怪物的总数，第二个怪物的数量
         int enemy2Count = enemyCount - enemy1Count;
         //剩余需要生成的怪物列数
@@ -475,7 +475,11 @@ public class GameManager : MonoBehaviour
         List<int> enemyColumnList = new List<int>();
         do
         {
-            int t = Random.Range(1, columnLastEnemy);
+            int t = Random.Range(1, 4);
+            if (t > columnLastEnemy)
+            {
+                t = columnLastEnemy;
+            }
             enemyColumnList.Add(t);
             columnLastEnemy -= t;
         } while (columnLastEnemy > 0);

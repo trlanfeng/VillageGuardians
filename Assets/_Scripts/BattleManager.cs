@@ -47,6 +47,7 @@ public class BattleManager : MonoBehaviour
         //    actorID++;
         //}
         Hero h = new Hero();
+        h.setJsonToHero(GM.JSONO.GetField("job")[0]);
         heroList.Add(h);
         h.GameObject = GameObject.Find("Canvas").transform.Find("Panel_Fight/HeroList/Hero1").gameObject;
         ActorList.Add(h as ActItem);
@@ -126,6 +127,11 @@ public class BattleManager : MonoBehaviour
                 {
                     isAttackToDead = true;
                     deadID = defencer;
+                    Debug.Log("角色等级：" + heroList[attacker].level);
+                    Debug.Log("角色经验：" + heroList[attacker].exp);
+                    Debug.Log("角色攻击：" + heroList[attacker].str);
+                    //升级检测
+                    heroList[attacker].checkLevel();
                 }
             }
             else

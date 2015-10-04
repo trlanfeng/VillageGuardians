@@ -25,13 +25,15 @@ public class BattleManager : MonoBehaviour
     float actTimer;
     //每回合行动时间
     float everyActTime;
-
+    int wave;
     GameManager GM;
 
-    // Use this for initialization
-    void Start()
+    Text leftWave;
+    GameObject backToVillageButton;
+
+    public void init()
     {
-        GM = this.GetComponent<GameManager>();
+        wave = 0;
         heroList = new List<Hero>();
         enemyList = new List<Enemy>();
         inAct = false;
@@ -50,13 +52,28 @@ public class BattleManager : MonoBehaviour
         ActorList.Add(h as ActItem);
         actorID++;
 
-        createEnemys();
+        leftWave = GameObject.Find("Canvas").transform.Find("Panel_Fight/Text_leftWave").GetComponent<Text>();
+        backToVillageButton = GameObject.Find("Canvas").transform.Find("Panel_Fight/Button").gameObject;
+        backToVillageButton.SetActive(false);
+
 
         actTimer = 2f;
         everyActTime = 0.5f;
+
+        isAttackToDead = false;
+
+        createEnemys();
     }
+
+    void Start()
+    {
+        GM = this.GetComponent<GameManager>();
+    }
+
     Button btn;
-    // Update is called once per frame
+    bool isAttackToDead;
+    int deadID;
+
     void Update()
     {
         if (!GM.Fight.activeSelf)
@@ -75,7 +92,7 @@ public class BattleManager : MonoBehaviour
         }
         if (blinkTotal > 0)
         {
-            hertBlink(beHurtGameObject, false);
+            hertBlink(beHurtGameObject, isAttackToDead, deadID);
         }
     }
     #region 进行一个回合
@@ -92,7 +109,8 @@ public class BattleManager : MonoBehaviour
         int defencer = -1;
         if (ActorList[currentActorIndex].ActorType == 1)
         {
-            int i = Random.Range(0, enemyList.Count);
+            //int i = Random.Range(0, enemyList.Count);
+            int i = 0;
             attacker = currentActorIndex;
             defencer = i;
             Debug.Log("id:::" + i);
@@ -106,13 +124,8 @@ public class BattleManager : MonoBehaviour
                 Debug.Log("被攻击者的生命：" + enemyList[defencer].HP);
                 if (enemyList[defencer].HP <= 0)
                 {
-                    GameObject.Destroy(enemyList[defencer].GameObject);
-                    enemyList.RemoveAt(defencer);
-                    ActorList.RemoveAt(defencer + heroList.Count);
-                    if (enemyList.Count == 0)
-                    {
-                        createEnemys();
-                    }
+                    isAttackToDead = true;
+                    deadID = defencer;
                 }
             }
             else
@@ -176,13 +189,20 @@ public class BattleManager : MonoBehaviour
     float blinkTotal = 0;
     float blinkTimer = 0;
     bool timerUp = false;
-    void hertBlink(GameObject go, bool isDead)
+    void hertBlink(GameObject go, bool isDead, int did)
     {
         blinkTotal -= Time.deltaTime;
         if (go != null)
         {
             Image img = go.transform.Find("Image").GetComponent<Image>();
-            img.color = new Color(img.color.r, img.color.g, img.color.b, blinkTimer);
+            if (isDead)
+            {
+                img.color = new Color(1, 0, 0, blinkTimer);
+            }
+            else
+            {
+                img.color = new Color(img.color.r, img.color.g, img.color.b, blinkTimer);
+            }
             if (blinkTimer >= 1)
             {
                 timerUp = false;
@@ -201,9 +221,21 @@ public class BattleManager : MonoBehaviour
             }
             if (blinkTotal < 0)
             {
+                if (isDead && did > -1)
+                {
+                    GameObject.Destroy(enemyList[did].GameObject);
+                    enemyList.RemoveAt(did);
+                    ActorList.RemoveAt(did + heroList.Count);
+                    if (enemyList.Count == 0)
+                    {
+                        createEnemys();
+                    }
+                }
+                isAttackToDead = false;
+                deadID = -1;
                 inAct = false;
                 blinkTotal = 0;
-                img.color = new Color(img.color.r, img.color.g, img.color.b, 1);
+                img.color = new Color(1, 1, 1, 1);
             }
             else
             {
@@ -218,16 +250,17 @@ public class BattleManager : MonoBehaviour
     }
     #endregion
 
-    int wave = 0;
     void createEnemys()
     {
         enemyList.Clear();
         int[][] enemys = GM.enemyIDList;
         if (wave >= enemys.Length)
         {
+            backToVillageButton.SetActive(true);
             isEnd = true;
             return;
         }
+        leftWave.text = "第 " + (wave + 1).ToString() + " 波 / 共 " + enemys.Length + " 波";
         Debug.Log("enemyWave:::" + enemys.Length);
         for (int i = 0; i < enemys.Length; i++)
         {
@@ -243,6 +276,7 @@ public class BattleManager : MonoBehaviour
             go.transform.Find("Image").GetComponent<Image>().sprite = Resources.Load<Sprite>(png);
             go.transform.Find("Image").GetComponent<Image>().SetNativeSize();
             Enemy e = new Enemy();
+            Debug.Log("enemyID:::" + enemys[wave][j]);
             e.setJsonToEnemy(GM.JSONO.GetField("enemy")[enemys[wave][j]]);
             e.GameObject = go;
             ActorList.Add(e as ActItem);

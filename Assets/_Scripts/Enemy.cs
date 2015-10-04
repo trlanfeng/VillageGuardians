@@ -23,7 +23,7 @@ public class Enemy : ActItem
 
     public void setJsonToEnemy(JSONObject jo)
     {
-        jo.GetField(ref HP, "hp");
+        jo.GetField(ref HP, "HP");
         jo.GetField(ref str, "str");
         jo.GetField(ref def, "def");
         jo.GetField(ref exp, "exp");

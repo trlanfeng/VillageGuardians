@@ -8,6 +8,8 @@ public class GameManager : MonoBehaviour
 {
     Player player;
 
+    BattleManager BM;
+
     //获取各组件的 RectTransform 方便进行设置
     public RectTransform PanelList;
 
@@ -53,6 +55,7 @@ public class GameManager : MonoBehaviour
     public GameObject Canvas;
 
     Text Text_Gold;
+    Text Text_Day;
 
     enum ItemType
     {
@@ -71,6 +74,8 @@ public class GameManager : MonoBehaviour
         player = new Player();
         player.gold = 10000;
 
+        BM = this.gameObject.GetComponent<BattleManager>();
+
         TextAsset dataFile = Resources.Load("dataFile") as TextAsset;
         dataJSON = dataFile.text;
         JSONO = new JSONObject(dataJSON);
@@ -85,6 +90,9 @@ public class GameManager : MonoBehaviour
         Fight.SetActive(false);
         Text_Gold = Village.transform.Find("TopBanner/Text_Gold").GetComponent<Text>();
         Text_Gold.text = player.gold + " G";
+
+        Text_Day = Village.transform.Find("TopBanner/Text_Day").GetComponent<Text>();
+        Text_Day.text = "第 " + (level+1).ToString() + " 天";
 
         player.bagSize = 20 + itemList[4].count * 20;
 
@@ -591,10 +599,13 @@ public class GameManager : MonoBehaviour
         generateEnemyList(level);
         Village.SetActive(false);
         Fight.SetActive(true);
+        BM.init();
     }
     public void backToVillage()
     {
         Village.SetActive(true);
         Fight.SetActive(false);
+        level += 1;
+        Text_Day.text = "第 " + (level + 1).ToString() + " 天";
     }
 }

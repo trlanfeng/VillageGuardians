@@ -509,8 +509,11 @@ public class GameManager : MonoBehaviour
                 }
                 else if (r >= 0.7f && enemy2Count > 0)
                 {
-                    enemyIDList[i][j] = int.Parse(enemyList[1]);
-                    enemy2Count -= 1;
+                    if (enemyList.Length > 1)
+                    {
+                        enemyIDList[i][j] = int.Parse(enemyList[1]);
+                        enemy2Count -= 1;
+                    }
                 }
             }
         }

@@ -31,6 +31,8 @@ public class BattleManager : MonoBehaviour
     Text leftWave;
     GameObject backToVillageButton;
 
+    Hero hero1;
+
     public void init()
     {
         wave = 0;
@@ -46,12 +48,9 @@ public class BattleManager : MonoBehaviour
         //    ActorList.Add(new ActItem(actorID, playerList[i], 1));
         //    actorID++;
         //}
-        Hero h = new Hero();
-        h.setJsonToHero(GM.JSONO.GetField("job")[0]);
-        heroList.Add(h);
-        h.GameObject = GameObject.Find("Canvas").transform.Find("Panel_Fight/HeroList/Hero1").gameObject;
-        ActorList.Add(h as ActItem);
+        ActorList.Add(hero1 as ActItem);
         actorID++;
+        heroList.Add(hero1);
 
         leftWave = GameObject.Find("Canvas").transform.Find("Panel_Fight/Text_leftWave").GetComponent<Text>();
         backToVillageButton = GameObject.Find("Canvas").transform.Find("Panel_Fight/Button").gameObject;
@@ -69,6 +68,9 @@ public class BattleManager : MonoBehaviour
     void Start()
     {
         GM = this.GetComponent<GameManager>();
+        hero1 = new Hero();
+        hero1.setJsonToHero(GM.JSONO.GetField("job")[0]);
+        hero1.GameObject = GameObject.Find("Canvas").transform.Find("Panel_Fight/HeroList/Hero1").gameObject;
     }
 
     Button btn;
@@ -127,11 +129,12 @@ public class BattleManager : MonoBehaviour
                 {
                     isAttackToDead = true;
                     deadID = defencer;
+                    heroList[attacker].exp += enemyList[defencer].exp;
                     Debug.Log("角色等级：" + heroList[attacker].level);
                     Debug.Log("角色经验：" + heroList[attacker].exp);
                     Debug.Log("角色攻击：" + heroList[attacker].str);
                     //升级检测
-                    heroList[attacker].checkLevel();
+                    heroList[attacker].checkLevelUp();
                 }
             }
             else

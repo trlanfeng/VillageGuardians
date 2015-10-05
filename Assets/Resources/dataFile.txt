@@ -69,9 +69,13 @@
         { "id": 23, "name": "龙", "png": "images/enemy/dragon", "HP": 20000, "str": 1200, "def": 120, "exp": 999, "gold": 999 }
     ],
     "level": [
+        { "id": 0, "enemy": "0" },
         { "id": 0, "enemy": "0.1" },
+        { "id": 1, "enemy": "1.0" },
         { "id": 1, "enemy": "1.2" },
+        { "id": 1, "enemy": "2.1" },
         { "id": 2, "enemy": "2.3" },
+        { "id": 3, "enemy": "3.2" },
         { "id": 3, "enemy": "3.4" },
         { "id": 4, "enemy": "4.5" },
         { "id": 5, "enemy": "5.6" },

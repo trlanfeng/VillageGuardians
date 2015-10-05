@@ -10,4 +10,9 @@ public class Player
     public int item3Count;
     public int item4Count;
     public int item5Count;
+
+    public Player()
+    {
+        gold = 10000;
+    }
 }

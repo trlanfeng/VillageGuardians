@@ -72,6 +72,7 @@ public class GameManager : MonoBehaviour
     {
         level = 0;
         player = new Player();
+        LoadData();
         player.gold = 10000;
 
         BM = this.gameObject.GetComponent<BattleManager>();
@@ -614,6 +615,7 @@ public class GameManager : MonoBehaviour
         Village.SetActive(false);
         Fight.SetActive(true);
         BM.init();
+        SaveData();
     }
     public void backToVillage()
     {
@@ -621,5 +623,24 @@ public class GameManager : MonoBehaviour
         Fight.SetActive(false);
         level += 1;
         Text_Day.text = "第 " + (level + 1).ToString() + " 天";
+        SaveData();
+    }
+    public void SaveData()
+    {
+        JSONObject gameData = new JSONObject(JSONObject.Type.OBJECT);
+        gameData.AddField("level", level);
+        gameData.AddField("gold", player.gold);
+        PlayerPrefs.SetString("gameData", gameData.ToString());
+    }
+
+    public void LoadData()
+    {
+        if (PlayerPrefs.HasKey("gameData"))
+        {
+            string gameData = PlayerPrefs.GetString("gameData");
+            JSONObject j = new JSONObject(gameData);
+            j.GetField(ref level, "level");
+            j.GetField(ref player.gold, "gold");
+        }
     }
 }

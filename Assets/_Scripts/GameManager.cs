@@ -450,69 +450,80 @@ public class GameManager : MonoBehaviour
     {
         string enemyListString = "";
         JSONO.GetField("level")[level].GetField(ref enemyListString, "enemy");
-        //enemyList：存储着需要生成怪物的ID
-        string[] enemyList = new string[enemyListString.Split('.').Length];
-        enemyList = enemyListString.Split('.');
-        //共随机多少个怪
-        int enemyCount = 0;
-        int enemyCountMin = 0;
-        int enemyCountMax = 0;
-        if (level < 10)
+        bool isBossLevel = false;
+        JSONO.GetField("level")[level].GetField(ref isBossLevel, "isBoss");
+        if (isBossLevel)
         {
-            enemyCountMin = 4;
-            enemyCountMax = 8;
-        }
-        else if (level >= 10 && level < 18)
-        {
-            enemyCountMin = 6;
-            enemyCountMax = 12;
+            enemyIDList = new int[1][];
+            enemyIDList[0] = new int[1];
+            enemyIDList[0][0] = int.Parse(enemyListString);
         }
         else
         {
-            enemyCountMin = 8;
-            enemyCountMax = 16;
-        }
-        enemyCount = Random.Range(enemyCountMin, enemyCountMax);
-        //第一个随机70%-100%的几率，第一个怪物的数量
-        int enemy1Count = Mathf.RoundToInt(Random.Range(0.7f, 1f) * enemyCount);
-        //第二个取1减掉第一个的百分比几率再乘以怪物的总数，第二个怪物的数量
-        int enemy2Count = enemyCount - enemy1Count;
-        //剩余需要生成的怪物列数
-        int columnLastEnemy = enemyCount;
-        //eneyColumnList：存储的每一列的怪物个数
-        List<int> enemyColumnList = new List<int>();
-        do
-        {
-            int t = Random.Range(1, 4);
-            if (t > columnLastEnemy)
+            //enemyList：存储着需要生成怪物的ID
+            string[] enemyList = new string[enemyListString.Split('.').Length];
+            enemyList = enemyListString.Split('.');
+            //共随机多少个怪
+            int enemyCount = 0;
+            int enemyCountMin = 0;
+            int enemyCountMax = 0;
+            if (level < 10)
             {
-                t = columnLastEnemy;
+                enemyCountMin = 4;
+                enemyCountMax = 8;
             }
-            enemyColumnList.Add(t);
-            columnLastEnemy -= t;
-        } while (columnLastEnemy > 0);
-        //enemyColumnList是需要生成的怪物的所有数据，是一个列表，列表每一项存储的是当列的怪物个数
-        enemyIDList = new int[enemyColumnList.Count][];
-        for (int i = 0; i < enemyColumnList.Count; i++)
-        {
-            enemyIDList[i] = new int[enemyColumnList[i]];
-        }
-        for (int i = 0; i < enemyIDList.Length; i++)
-        {
-            for (int j = 0; j < enemyIDList[i].Length; j++)
+            else if (level >= 10 && level < 18)
             {
-                float r = Random.Range(0, 1f);
-                if (r < 0.7f && enemy1Count > 0)
+                enemyCountMin = 6;
+                enemyCountMax = 12;
+            }
+            else
+            {
+                enemyCountMin = 8;
+                enemyCountMax = 16;
+            }
+            enemyCount = Random.Range(enemyCountMin, enemyCountMax);
+            //第一个随机70%-100%的几率，第一个怪物的数量
+            int enemy1Count = Mathf.RoundToInt(Random.Range(0.7f, 1f) * enemyCount);
+            //第二个取1减掉第一个的百分比几率再乘以怪物的总数，第二个怪物的数量
+            int enemy2Count = enemyCount - enemy1Count;
+            //剩余需要生成的怪物列数
+            int columnLastEnemy = enemyCount;
+            //eneyColumnList：存储的每一列的怪物个数
+            List<int> enemyColumnList = new List<int>();
+            do
+            {
+                int t = Random.Range(1, 4);
+                if (t > columnLastEnemy)
                 {
-                    enemyIDList[i][j] = int.Parse(enemyList[0]);
-                    enemy1Count -= 1;
+                    t = columnLastEnemy;
                 }
-                else if (r >= 0.7f && enemy2Count > 0)
+                enemyColumnList.Add(t);
+                columnLastEnemy -= t;
+            } while (columnLastEnemy > 0);
+            //enemyColumnList是需要生成的怪物的所有数据，是一个列表，列表每一项存储的是当列的怪物个数
+            enemyIDList = new int[enemyColumnList.Count][];
+            for (int i = 0; i < enemyColumnList.Count; i++)
+            {
+                enemyIDList[i] = new int[enemyColumnList[i]];
+            }
+            for (int i = 0; i < enemyIDList.Length; i++)
+            {
+                for (int j = 0; j < enemyIDList[i].Length; j++)
                 {
-                    if (enemyList.Length > 1)
+                    float r = Random.Range(0, 1f);
+                    if (r < 0.7f && enemy1Count > 0)
                     {
-                        enemyIDList[i][j] = int.Parse(enemyList[1]);
-                        enemy2Count -= 1;
+                        enemyIDList[i][j] = int.Parse(enemyList[0]);
+                        enemy1Count -= 1;
+                    }
+                    else if (r >= 0.7f && enemy2Count > 0)
+                    {
+                        if (enemyList.Length > 1)
+                        {
+                            enemyIDList[i][j] = int.Parse(enemyList[1]);
+                            enemy2Count -= 1;
+                        }
                     }
                 }
             }

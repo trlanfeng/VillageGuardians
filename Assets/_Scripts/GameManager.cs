@@ -73,7 +73,6 @@ public class GameManager : MonoBehaviour
         level = 0;
         player = new Player();
         LoadData();
-        player.gold = 10000;
 
         BM = this.gameObject.GetComponent<BattleManager>();
 

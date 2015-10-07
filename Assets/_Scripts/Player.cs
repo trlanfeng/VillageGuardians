@@ -3,16 +3,7 @@ using System.Collections;
 
 public class Player
 {
-    public int gold;
+    public int gold = 0;
     public int bagSize;
-    public int item1Count;
-    public int item2Count;
-    public int item3Count;
-    public int item4Count;
-    public int item5Count;
-
-    public Player()
-    {
-        gold = 10000;
-    }
+    public int[] itemCount = new int[5];
 }

@@ -72,13 +72,14 @@ public class GameManager : MonoBehaviour
     {
         level = 0;
         player = new Player();
-        LoadData();
-
         BM = this.gameObject.GetComponent<BattleManager>();
 
         TextAsset dataFile = Resources.Load("dataFile") as TextAsset;
         dataJSON = dataFile.text;
         JSONO = new JSONObject(dataJSON);
+
+        LoadData();
+
         createItemList();
         createEquipmentList();
         createMagicList();
@@ -94,7 +95,7 @@ public class GameManager : MonoBehaviour
         Text_Day = Village.transform.Find("TopBanner/Text_Day").GetComponent<Text>();
         Text_Day.text = "第 " + (level+1).ToString() + " 天";
 
-        player.bagSize = 20 + itemList[4].count * 20;
+        player.bagSize = 20 + player.itemCount[4] * 20;
 
         generateEnemyList(level);
     }
@@ -187,7 +188,7 @@ public class GameManager : MonoBehaviour
             JSONO.GetField("item")[i].GetField(ref item.cure, "cure");
             JSONO.GetField("item")[i].GetField(ref item.comment, "comment");
             string text_desc = item.name + "\n" + item.comment;
-            string text_info = "数量 " + item.count.ToString() + "\n" + item.gold.ToString() + " G";
+            string text_info = "数量 " + player.itemCount[i].ToString() + "\n" + item.gold.ToString() + " G";
             Text Text_desc = newItem.transform.Find("Text_desc").GetComponent<Text>();
             Text_desc.text = text_desc;
             Text Text_info = newItem.transform.Find("Text_info").GetComponent<Text>();
@@ -206,9 +207,9 @@ public class GameManager : MonoBehaviour
         {
             case ItemType.Item:
                 int itemCount = 0;
-                for (int i = 0; i < itemList.Length - 1; i++)
+                for (int i = 0; i < player.itemCount.Length - 1; i++)
                 {
-                    itemCount += itemList[i].count;
+                    itemCount += player.itemCount[i];
                 }
                 if (itemCount >= player.bagSize && index != 4)
                 {
@@ -216,16 +217,16 @@ public class GameManager : MonoBehaviour
                 }
                 if (player.gold >= itemList[index].gold)
                 {
-                    itemList[index].count += 1;
+                    player.itemCount[index] += 1;
                     player.gold -= itemList[index].gold;
-                    string text_info = "数量 " + itemList[index].count.ToString() + "\n" + itemList[index].gold.ToString() + " G";
+                    string text_info = "数量 " + player.itemCount[index].ToString() + "\n" + itemList[index].gold.ToString() + " G";
                     Text Text_info = itemList[index].GameObject.transform.Find("Text_info").GetComponent<Text>();
                     Text_info.text = text_info;
                     Text_Gold.text = player.gold + " G";
                 }
                 if (index == 4)
                 {
-                    player.bagSize = 20 + itemList[4].count * 20;
+                    player.bagSize = 20 + player.itemCount[4] * 20;
                 }
                 break;
             case ItemType.Equipment:
@@ -629,6 +630,10 @@ public class GameManager : MonoBehaviour
         JSONObject gameData = new JSONObject(JSONObject.Type.OBJECT);
         gameData.AddField("level", level);
         gameData.AddField("gold", player.gold);
+        for (int i = 0; i < JSONO.GetField("item").Count; i++)
+        {
+            gameData.AddField("item" + i + "Count", player.itemCount[i]);
+        }
         PlayerPrefs.SetString("gameData", gameData.ToString());
     }
 
@@ -640,6 +645,10 @@ public class GameManager : MonoBehaviour
             JSONObject j = new JSONObject(gameData);
             j.GetField(ref level, "level");
             j.GetField(ref player.gold, "gold");
+            for (int i = 0; i < JSONO.GetField("item").Count; i++)
+            {
+                j.GetField(ref player.itemCount[i], "item" + i + "Count");
+            }
         }
     }
 }

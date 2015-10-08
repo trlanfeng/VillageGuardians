@@ -95,8 +95,6 @@ public class GameManager : MonoBehaviour
         Text_Day = Village.transform.Find("TopBanner/Text_Day").GetComponent<Text>();
         Text_Day.text = "第 " + (level+1).ToString() + " 天";
 
-        player.bagSize = 20 + player.itemCount[4] * 20;
-
         generateEnemyList(level);
     }
 
@@ -645,7 +643,7 @@ public class GameManager : MonoBehaviour
             JSONObject j = new JSONObject(gameData);
             j.GetField(ref level, "level");
             j.GetField(ref player.gold, "gold");
-            for (int i = 0; i < JSONO.GetField("item").Count; i++)
+            for (int i = 0; i < 5; i++)
             {
                 j.GetField(ref player.itemCount[i], "item" + i + "Count");
             }

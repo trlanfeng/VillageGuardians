@@ -56,6 +56,7 @@ public class BattleManager : MonoBehaviour
         backToVillageButton = GameObject.Find("Canvas").transform.Find("Panel_Fight/Button").gameObject;
         backToVillageButton.SetActive(false);
 
+        EnemyListRT = GameObject.Find("Canvas").transform.Find("Panel_Fight/EnemyList").GetComponent<RectTransform>();
 
         actTimer = 2f;
         everyActTime = 0.5f;
@@ -80,6 +81,11 @@ public class BattleManager : MonoBehaviour
     void Update()
     {
         if (!GM.Fight.activeSelf)
+        {
+            return;
+        }
+        lerpEnemy();
+        if (!isWaveIn)
         {
             return;
         }
@@ -155,6 +161,10 @@ public class BattleManager : MonoBehaviour
             if (beHurtHP > 0)
             {
                 heroList[defencer].HP = heroList[defencer].HP - beHurtHP;
+				if (heroList[defencer].HP <= 0)
+				{
+					Debug.Log("游戏结束");
+				}
                 Debug.Log("被攻击者的生命：" + heroList[defencer].HP);
             }
             else
@@ -259,8 +269,10 @@ public class BattleManager : MonoBehaviour
     }
     #endregion
 
+    bool isWaveIn = false;
     void createEnemys()
     {
+        EnemyListRT.anchoredPosition = new Vector2(75, 110);
         enemyList.Clear();
         int[][] enemys = GM.enemyIDList;
         if (wave >= enemys.Length)
@@ -292,5 +304,28 @@ public class BattleManager : MonoBehaviour
             enemyList.Add(e);
         }
         wave += 1;
+        isLerping = true;
+        lerpTimer = 0;
+        isWaveIn = false;
+        currentActorIndex = 0;
+    }
+
+    float lerpTimer = 0;
+    bool isLerping = false;
+    Vector2 fromPosition = new Vector2(75,110);
+    Vector2 toPosition= new Vector2(-110,110);
+    RectTransform EnemyListRT;
+    void lerpEnemy()
+    {
+        if (isLerping)
+        {
+            lerpTimer += Time.deltaTime;
+            EnemyListRT.anchoredPosition = Vector2.Lerp(fromPosition, toPosition, lerpTimer);
+            if (lerpTimer > 1)
+            {
+                isLerping = false;
+                isWaveIn = true;
+            }
+        }
     }
 }

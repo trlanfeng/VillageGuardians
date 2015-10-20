@@ -75,6 +75,7 @@ public class BattleManager : MonoBehaviour
         hero1 = new Hero();
         hero1.setJsonToHero(GM.JSONO.GetField("job")[0]);
         hero1.GameObject = GameObject.Find("Canvas").transform.Find("Panel_Fight/HeroList/Hero1").gameObject;
+        bindInfo();
     }
 
     Button btn;
@@ -92,6 +93,7 @@ public class BattleManager : MonoBehaviour
         {
             return;
         }
+        updateInfo();
         fixActorIndex();
         if (!inAct && !isEnd)
         {
@@ -285,6 +287,7 @@ public class BattleManager : MonoBehaviour
         {
             backToVillageButton.SetActive(true);
             isEnd = true;
+            hero1.SaveData();
             return;
         }
         leftWave.text = "第 " + (wave + 1).ToString() + " 波 / 共 " + enemys.Length + " 波";
@@ -314,6 +317,54 @@ public class BattleManager : MonoBehaviour
         lerpTimer = 0;
         isWaveIn = false;
         currentActorIndex = 0;
+    }
+
+    Text Text_LV;
+    Slider Slider_LV;
+    Text Text_HP;
+    Slider Slider_HP;
+    Text Text_MP;
+    Slider Slider_MP;
+    void bindInfo()
+    {
+        Transform info = GameObject.Find("Canvas").transform.Find("Panel_Fight/Panel_Info");
+        Text_LV = info.Find("Text_LV").GetComponent<Text>();
+        Slider_LV = info.Find("Slider_LV").GetComponent<Slider>();
+        Text_HP = info.Find("Text_HP").GetComponent<Text>();
+        Slider_HP = info.Find("Slider_HP").GetComponent<Slider>();
+        Text_MP = info.Find("Text_MP").GetComponent<Text>();
+        Slider_MP = info.Find("Slider_MP").GetComponent<Slider>();
+    }
+    void updateInfo()
+    {
+        float nextLvExp = Mathf.Round(Mathf.Pow((hero1.level), 0.4f) * Mathf.Pow(hero1.level, 2) * 5);
+        Text_LV.text = "Lv："+hero1.level.ToString();
+        if (hero1.MPMax != 0)
+        {
+            Slider_LV.value = hero1.exp / nextLvExp;
+        }
+        else
+        {
+            Slider_LV.value = 0;
+        }
+        Text_HP.text = "HP：" + hero1.HP + "/" + hero1.HPMax;
+        if (hero1.MPMax != 0)
+        {
+            Slider_HP.value = hero1.HP / hero1.HPMax;
+        }
+        else
+        {
+            Slider_HP.value = 0;
+        }
+        Text_MP.text = "MP：" + hero1.MP + "/" + hero1.MPMax;
+        if (hero1.MPMax != 0)
+        {
+            Slider_MP.value = hero1.MP / hero1.MPMax;
+        }
+        else
+        {
+            Slider_MP.value = 0;
+        }
     }
 
     float lerpTimer = 0;

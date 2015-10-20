@@ -93,7 +93,7 @@ public class GameManager : MonoBehaviour
         Text_Gold.text = player.gold + " G";
 
         Text_Day = Village.transform.Find("TopBanner/Text_Day").GetComponent<Text>();
-        Text_Day.text = "第 " + (level+1).ToString() + " 天";
+        Text_Day.text = "第 " + (level + 1).ToString() + " 天";
 
         generateEnemyList(level);
     }
@@ -652,6 +652,6 @@ public class GameManager : MonoBehaviour
 
     public void GameOver()
     {
-        Application.LoadLevel("Start");
+        SceneManager.LoadScene("Start", false);
     }
 }

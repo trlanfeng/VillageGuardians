@@ -66,7 +66,6 @@ public class Hero : ActItem
             exp -= _constExp;
             _constExp = Mathf.RoundToInt(Mathf.Pow((level), 0.4f) * Mathf.Pow(level, 2) * 5);
         }
-        SaveData();
     }
 
     public void levelUp()

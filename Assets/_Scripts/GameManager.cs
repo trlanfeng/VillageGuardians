@@ -649,4 +649,9 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+
+    public void GameOver()
+    {
+        Application.LoadLevel("Start");
+    }
 }

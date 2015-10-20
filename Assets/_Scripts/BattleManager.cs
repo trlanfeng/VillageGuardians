@@ -30,6 +30,7 @@ public class BattleManager : MonoBehaviour
 
     Text leftWave;
     GameObject backToVillageButton;
+    GameObject gameOverButton;
 
     Hero hero1;
 
@@ -53,8 +54,10 @@ public class BattleManager : MonoBehaviour
         heroList.Add(hero1);
 
         leftWave = GameObject.Find("Canvas").transform.Find("Panel_Fight/Text_leftWave").GetComponent<Text>();
-        backToVillageButton = GameObject.Find("Canvas").transform.Find("Panel_Fight/Button").gameObject;
+        backToVillageButton = GameObject.Find("Canvas").transform.Find("Panel_Fight/Button_Win").gameObject;
         backToVillageButton.SetActive(false);
+        gameOverButton = GameObject.Find("Canvas").transform.Find("Panel_Fight/Button_GameOver").gameObject;
+        gameOverButton.SetActive(false);
 
         EnemyListRT = GameObject.Find("Canvas").transform.Find("Panel_Fight/EnemyList").GetComponent<RectTransform>();
 
@@ -163,7 +166,10 @@ public class BattleManager : MonoBehaviour
                 heroList[defencer].HP = heroList[defencer].HP - beHurtHP;
 				if (heroList[defencer].HP <= 0)
 				{
-					Debug.Log("游戏结束");
+                    Debug.Log("游戏结束");
+                    gameOverButton.SetActive(true);
+                    isEnd = true;
+                    return;
 				}
                 Debug.Log("被攻击者的生命：" + heroList[defencer].HP);
             }

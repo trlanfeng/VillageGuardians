@@ -492,7 +492,19 @@ public class GameManager : MonoBehaviour
             List<int> enemyColumnList = new List<int>();
             do
             {
-                int t = Random.Range(1, 4);
+                int t = 1;
+                if (level < 10)
+                {
+                    t = Random.Range(1, 3);
+                }
+                else if (level >= 10 && level < 18)
+                {
+                    t = Random.Range(1, 4);
+                }
+                else
+                {
+                    t = Random.Range(1, 5);
+                }
                 if (t > columnLastEnemy)
                 {
                     t = columnLastEnemy;

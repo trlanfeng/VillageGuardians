@@ -76,6 +76,7 @@ public class BattleManager : MonoBehaviour
         hero1.setJsonToHero(GM.JSONO.GetField("job")[0]);
         hero1.GameObject = GameObject.Find("Canvas").transform.Find("Panel_Fight/HeroList/Hero1").gameObject;
         bindInfo();
+        updateInfo();
     }
 
     Button btn;
@@ -132,6 +133,13 @@ public class BattleManager : MonoBehaviour
             moveDistance = Mathf.Abs(moveDistance);
             Debug.Log("执行了一次攻击！");
             int beHurtHP = heroList[attacker].str - enemyList[defencer].def;
+            beHurtHP = Random.Range(beHurtHP, beHurtHP + 4);
+            //十分之一的暴击几率
+            float crit = Random.Range(0, 10);
+            if (crit < 1)
+            {
+                beHurtHP = beHurtHP * 2;
+            }
             if (beHurtHP > 0)
             {
                 enemyList[defencer].HP = enemyList[defencer].HP - beHurtHP;
@@ -339,7 +347,7 @@ public class BattleManager : MonoBehaviour
     {
         float nextLvExp = Mathf.Round(Mathf.Pow((hero1.level), 0.4f) * Mathf.Pow(hero1.level, 2) * 5);
         Text_LV.text = "Lv："+hero1.level.ToString();
-        if (hero1.MPMax != 0)
+        if (hero1.level != 0)
         {
             Slider_LV.value = hero1.exp / nextLvExp;
         }
@@ -348,9 +356,9 @@ public class BattleManager : MonoBehaviour
             Slider_LV.value = 0;
         }
         Text_HP.text = "HP：" + hero1.HP + "/" + hero1.HPMax;
-        if (hero1.MPMax != 0)
+        if (hero1.HP != 0)
         {
-            Slider_HP.value = hero1.HP / hero1.HPMax;
+            Slider_HP.value = (float)hero1.HP / hero1.HPMax;
         }
         else
         {
@@ -359,7 +367,7 @@ public class BattleManager : MonoBehaviour
         Text_MP.text = "MP：" + hero1.MP + "/" + hero1.MPMax;
         if (hero1.MPMax != 0)
         {
-            Slider_MP.value = hero1.MP / hero1.MPMax;
+            Slider_MP.value = (float)hero1.MP / hero1.MPMax;
         }
         else
         {

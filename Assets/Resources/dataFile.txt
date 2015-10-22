@@ -71,6 +71,8 @@
     "level": [
         { "id": 0, "enemy": "0" },
         { "id": 0, "enemy": "0.1" },
+        { "id": 0, "enemy": "1.0" },
+        { "id": 0, "enemy": "1" },
         { "id": 1, "enemy": "2", "isBoss": true },
         { "id": 1, "enemy": "1.2" },
         { "id": 1, "enemy": "2.1" },

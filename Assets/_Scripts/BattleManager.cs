@@ -127,40 +127,7 @@ public class BattleManager : MonoBehaviour
         int defencer = -1;
         if (ActorList[currentActorIndex].ActorType == 1)
         {
-            int lostHP = heroList[currentActorIndex].HPMax - heroList[currentActorIndex].HP;
-            if (lostHP >= 10 && lostHP < 30)
-            {
-                if (GM.player.itemCount[0] > 0)
-                {
-                    heroList[currentActorIndex].HP += 10;
-                    GM.player.itemCount[0] -= 1;
-                }
-            }
-            else if (lostHP >= 30 && lostHP < 100)
-            {
-                if (GM.player.itemCount[1] > 0)
-                {
-                    heroList[currentActorIndex].HP += 30;
-                    GM.player.itemCount[1] -= 1;
-                }
-            }
-            else if (lostHP >= 100 && lostHP < 500)
-            {
-                if (GM.player.itemCount[2] > 0)
-                {
-                    heroList[currentActorIndex].HP += 100;
-                    GM.player.itemCount[2] -= 1;
-                }
-            }
-            else if (lostHP >= 500)
-            {
-                if (GM.player.itemCount[3] > 0)
-                {
-                    heroList[currentActorIndex].HP += 500;
-                    GM.player.itemCount[3] -= 1;
-                }
-            }
-            else
+            if (!checkHPLose())
             {
                 //int i = Random.Range(0, enemyList.Count);
                 int i = 0;
@@ -187,6 +154,8 @@ public class BattleManager : MonoBehaviour
                         isAttackToDead = true;
                         deadID = defencer;
                         heroList[attacker].exp += enemyList[defencer].exp;
+                        Debug.Log("金币：" + enemyList[defencer].gold);
+                        GM.player.gold += enemyList[defencer].gold;
                         Debug.Log("角色等级：" + heroList[attacker].level);
                         Debug.Log("角色经验：" + heroList[attacker].exp);
                         Debug.Log("角色攻击：" + heroList[attacker].str);
@@ -364,6 +333,7 @@ public class BattleManager : MonoBehaviour
         lerpTimer = 0;
         isWaveIn = false;
         currentActorIndex = 0;
+        fillHP();
     }
 
     Text Text_LV;
@@ -459,6 +429,119 @@ public class BattleManager : MonoBehaviour
                 }
                 Text_Item.text += itemName + "   " + GM.player.itemCount[i] + "\n";
             }
+        }
+    }
+
+    /// <summary>
+    /// 检查生命值损失是否需要用药
+    /// </summary>
+    /// <returns>true为掉血了，需要补充生命值；false为不需要补充，继续战斗</returns>
+    bool checkHPLose()
+    {
+        int itemCount = 0;
+        foreach (var item in GM.player.itemCount)
+        {
+            itemCount += item;
+        }
+        if (itemCount == 0)
+        {
+            return false;
+        }
+        int lostHP = heroList[currentActorIndex].HPMax - heroList[currentActorIndex].HP;
+        if (lostHP >= 10 && lostHP < 30)
+        {
+            if (GM.player.itemCount[0] > 0)
+            {
+                heroList[currentActorIndex].HP += 10;
+                GM.player.itemCount[0] -= 1;
+            }
+        }
+        else if (lostHP >= 30 && lostHP < 100)
+        {
+            if (GM.player.itemCount[1] > 0)
+            {
+                heroList[currentActorIndex].HP += 30;
+                GM.player.itemCount[1] -= 1;
+            }
+        }
+        else if (lostHP >= 100 && lostHP < 500)
+        {
+            if (GM.player.itemCount[2] > 0)
+            {
+                heroList[currentActorIndex].HP += 100;
+                GM.player.itemCount[2] -= 1;
+            }
+        }
+        else if (lostHP >= 500)
+        {
+            if (GM.player.itemCount[3] > 0)
+            {
+                heroList[currentActorIndex].HP += 500;
+                GM.player.itemCount[3] -= 1;
+            }
+        }
+        else
+        {
+            return false;
+        }
+        return true;
+    }
+
+    void fillHP()
+    {
+        int lostHP = heroList[currentActorIndex].HPMax - heroList[currentActorIndex].HP;
+        int itemCount = 0;
+        foreach (var item in GM.player.itemCount)
+        {
+            itemCount += item;
+        }
+        if (itemCount == 0)
+        {
+            return;
+        }
+        while (lostHP > 5)
+        {
+            if (lostHP >= 500)
+            {
+                if (GM.player.itemCount[3] > 0)
+                {
+                    heroList[currentActorIndex].HP += 500;
+                    GM.player.itemCount[3] -= 1;
+                }
+            }
+            if (lostHP >= 100)
+            {
+                if (GM.player.itemCount[2] > 0)
+                {
+                    heroList[currentActorIndex].HP += 100;
+                    GM.player.itemCount[2] -= 1;
+                }
+            }
+            if (lostHP >= 30)
+            {
+                if (GM.player.itemCount[1] > 0)
+                {
+                    heroList[currentActorIndex].HP += 30;
+                    GM.player.itemCount[1] -= 1;
+                }
+            }
+            if (lostHP > 5)
+            {
+                if (GM.player.itemCount[0] > 0)
+                {
+                    heroList[currentActorIndex].HP += 10;
+                    GM.player.itemCount[0] -= 1;
+                }
+            }
+            if (lostHP == heroList[currentActorIndex].HPMax - heroList[currentActorIndex].HP)
+            {
+                break;
+            }
+            if (heroList[currentActorIndex].HP > heroList[currentActorIndex].HPMax)
+            {
+                heroList[currentActorIndex].HP = heroList[currentActorIndex].HPMax;
+            }
+            lostHP = heroList[currentActorIndex].HPMax - heroList[currentActorIndex].HP;
         }
     }
 }

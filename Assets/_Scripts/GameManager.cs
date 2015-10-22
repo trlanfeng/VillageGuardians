@@ -629,6 +629,7 @@ public class GameManager : MonoBehaviour
     }
     public void backToVillage()
     {
+        Text_Gold.text = player.gold + " G";
         Village.SetActive(true);
         Fight.SetActive(false);
         level += 1;

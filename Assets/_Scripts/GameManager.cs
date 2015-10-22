@@ -6,7 +6,7 @@ using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
-    Player player;
+    public Player player;
 
     BattleManager BM;
 

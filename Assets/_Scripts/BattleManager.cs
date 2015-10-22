@@ -77,6 +77,8 @@ public class BattleManager : MonoBehaviour
         hero1.GameObject = GameObject.Find("Canvas").transform.Find("Panel_Fight/HeroList/Hero1").gameObject;
         bindInfo();
         updateInfo();
+        Text_Item = GameObject.Find("Canvas").transform.Find("Panel_Fight/Text_Item").GetComponent<Text>();
+        updateItem();
     }
 
     Button btn;
@@ -95,6 +97,7 @@ public class BattleManager : MonoBehaviour
             return;
         }
         updateInfo();
+        updateItem();
         fixActorIndex();
         if (!inAct && !isEnd)
         {
@@ -124,41 +127,77 @@ public class BattleManager : MonoBehaviour
         int defencer = -1;
         if (ActorList[currentActorIndex].ActorType == 1)
         {
-            //int i = Random.Range(0, enemyList.Count);
-            int i = 0;
-            attacker = currentActorIndex;
-            defencer = i;
-            Debug.Log("id:::" + i);
-            beHurtGameObject = enemyList[i].GameObject;
-            moveDistance = Mathf.Abs(moveDistance);
-            Debug.Log("执行了一次攻击！");
-            int beHurtHP = heroList[attacker].str - enemyList[defencer].def;
-            beHurtHP = Random.Range(beHurtHP, beHurtHP + 4);
-            //十分之一的暴击几率
-            float crit = Random.Range(0, 10);
-            if (crit < 1)
+            int lostHP = heroList[currentActorIndex].HPMax - heroList[currentActorIndex].HP;
+            if (lostHP >= 10 && lostHP < 30)
             {
-                beHurtHP = beHurtHP * 2;
-            }
-            if (beHurtHP > 0)
-            {
-                enemyList[defencer].HP = enemyList[defencer].HP - beHurtHP;
-                Debug.Log("被攻击者的生命：" + enemyList[defencer].HP);
-                if (enemyList[defencer].HP <= 0)
+                if (GM.player.itemCount[0] > 0)
                 {
-                    isAttackToDead = true;
-                    deadID = defencer;
-                    heroList[attacker].exp += enemyList[defencer].exp;
-                    Debug.Log("角色等级：" + heroList[attacker].level);
-                    Debug.Log("角色经验：" + heroList[attacker].exp);
-                    Debug.Log("角色攻击：" + heroList[attacker].str);
-                    //升级检测
-                    heroList[attacker].checkLevelUp();
+                    heroList[currentActorIndex].HP += 10;
+                    GM.player.itemCount[0] -= 1;
+                }
+            }
+            else if (lostHP >= 30 && lostHP < 100)
+            {
+                if (GM.player.itemCount[1] > 0)
+                {
+                    heroList[currentActorIndex].HP += 30;
+                    GM.player.itemCount[1] -= 1;
+                }
+            }
+            else if (lostHP >= 100 && lostHP < 500)
+            {
+                if (GM.player.itemCount[2] > 0)
+                {
+                    heroList[currentActorIndex].HP += 100;
+                    GM.player.itemCount[2] -= 1;
+                }
+            }
+            else if (lostHP >= 500)
+            {
+                if (GM.player.itemCount[3] > 0)
+                {
+                    heroList[currentActorIndex].HP += 500;
+                    GM.player.itemCount[3] -= 1;
                 }
             }
             else
             {
-                Debug.Log("未破防");
+                //int i = Random.Range(0, enemyList.Count);
+                int i = 0;
+                attacker = currentActorIndex;
+                defencer = i;
+                Debug.Log("id:::" + i);
+                beHurtGameObject = enemyList[i].GameObject;
+                moveDistance = Mathf.Abs(moveDistance);
+                Debug.Log("执行了一次攻击！");
+                int beHurtHP = heroList[attacker].str - enemyList[defencer].def;
+                beHurtHP = Random.Range(beHurtHP, beHurtHP + 4);
+                //十分之一的暴击几率
+                float crit = Random.Range(0, 10);
+                if (crit < 1)
+                {
+                    beHurtHP = beHurtHP * 2;
+                }
+                if (beHurtHP > 0)
+                {
+                    enemyList[defencer].HP = enemyList[defencer].HP - beHurtHP;
+                    Debug.Log("被攻击者的生命：" + enemyList[defencer].HP);
+                    if (enemyList[defencer].HP <= 0)
+                    {
+                        isAttackToDead = true;
+                        deadID = defencer;
+                        heroList[attacker].exp += enemyList[defencer].exp;
+                        Debug.Log("角色等级：" + heroList[attacker].level);
+                        Debug.Log("角色经验：" + heroList[attacker].exp);
+                        Debug.Log("角色攻击：" + heroList[attacker].str);
+                        //升级检测
+                        heroList[attacker].checkLevelUp();
+                    }
+                }
+                else
+                {
+                    Debug.Log("未破防");
+                }
             }
         }
         else if (ActorList[currentActorIndex].ActorType == -1)
@@ -174,13 +213,13 @@ public class BattleManager : MonoBehaviour
             if (beHurtHP > 0)
             {
                 heroList[defencer].HP = heroList[defencer].HP - beHurtHP;
-				if (heroList[defencer].HP <= 0)
-				{
+                if (heroList[defencer].HP <= 0)
+                {
                     Debug.Log("游戏结束");
                     gameOverButton.SetActive(true);
                     isEnd = true;
                     return;
-				}
+                }
                 Debug.Log("被攻击者的生命：" + heroList[defencer].HP);
             }
             else
@@ -346,7 +385,7 @@ public class BattleManager : MonoBehaviour
     void updateInfo()
     {
         float nextLvExp = Mathf.Round(Mathf.Pow((hero1.level), 0.4f) * Mathf.Pow(hero1.level, 2) * 5);
-        Text_LV.text = "Lv："+hero1.level.ToString();
+        Text_LV.text = "Lv：" + hero1.level.ToString();
         if (hero1.level != 0)
         {
             Slider_LV.value = hero1.exp / nextLvExp;
@@ -377,8 +416,8 @@ public class BattleManager : MonoBehaviour
 
     float lerpTimer = 0;
     bool isLerping = false;
-    Vector2 fromPosition = new Vector2(75,110);
-    Vector2 toPosition= new Vector2(-110,110);
+    Vector2 fromPosition = new Vector2(75, 110);
+    Vector2 toPosition = new Vector2(-110, 110);
     RectTransform EnemyListRT;
     void lerpEnemy()
     {
@@ -390,6 +429,35 @@ public class BattleManager : MonoBehaviour
             {
                 isLerping = false;
                 isWaveIn = true;
+            }
+        }
+    }
+
+    Text Text_Item;
+    void updateItem()
+    {
+        Text_Item.text = "道具：\n";
+        for (int i = 0; i < GM.player.itemCount.Length; i++)
+        {
+            if (GM.player.itemCount[i] > 0)
+            {
+                string itemName = "";
+                switch (i)
+                {
+                    case 0:
+                        itemName = "面包";
+                        break;
+                    case 1:
+                        itemName = "药草";
+                        break;
+                    case 2:
+                        itemName = "蜂蜜酒";
+                        break;
+                    case 3:
+                        itemName = "Elixir";
+                        break;
+                }
+                Text_Item.text += itemName + "   " + GM.player.itemCount[i] + "\n";
             }
         }
     }

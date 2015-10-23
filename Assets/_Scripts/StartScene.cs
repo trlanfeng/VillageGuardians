@@ -17,4 +17,10 @@ public class StartScene : MonoBehaviour {
     {
         SceneManager.LoadScene("Game", false);
     }
+
+    public void ContinueGame()
+    {
+        PlayerPrefs.SetInt("load", 1);
+        SceneManager.LoadScene("Game", false);
+    }
 }

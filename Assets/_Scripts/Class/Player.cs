@@ -1,28 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Player
 {
     public int gold = 10000;
-    public int bagSize;
+    public int bagSize = 20;
     public int[] itemCount = new int[5];
+    public List<Hero> heroList = new List<Hero>();
 
-    public Player()
-    {
-        bagSize = 20 + itemCount[4] * 20;
-    }
-
-    void Load()
-    {
-        if (PlayerPrefs.HasKey("gameData"))
-        {
-            string gameData = PlayerPrefs.GetString("gameData");
-            JSONObject j = new JSONObject(gameData);
-            j.GetField(ref gold, "gold");
-            for (int i = 0; i < 5; i++)
-            {
-                j.GetField(ref itemCount[i], "item" + i + "Count");
-            }
-        }
-    }
 }

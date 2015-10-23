@@ -34,51 +34,10 @@ public class BattleManager : MonoBehaviour
 
     Hero hero1;
 
-    public void init()
-    {
-        wave = 0;
-        heroList = new List<Hero>();
-        enemyList = new List<Enemy>();
-        inAct = false;
-        isEnd = false;
-        actorID = 0;
-        currentActorIndex = 0;
-        ActorList = new List<ActItem>();
-        //for (int i = 0; i < playerList.Count; i++)
-        //{
-        //    ActorList.Add(new ActItem(actorID, playerList[i], 1));
-        //    actorID++;
-        //}
-        ActorList.Add(hero1 as ActItem);
-        actorID++;
-        heroList.Add(hero1);
-
-        leftWave = GameObject.Find("Canvas").transform.Find("Panel_Fight/Text_leftWave").GetComponent<Text>();
-        backToVillageButton = GameObject.Find("Canvas").transform.Find("Panel_Fight/Button_Win").gameObject;
-        backToVillageButton.SetActive(false);
-        gameOverButton = GameObject.Find("Canvas").transform.Find("Panel_Fight/Button_GameOver").gameObject;
-        gameOverButton.SetActive(false);
-
-        EnemyListRT = GameObject.Find("Canvas").transform.Find("Panel_Fight/EnemyList").GetComponent<RectTransform>();
-
-        actTimer = 2f;
-        everyActTime = 0.5f;
-
-        isAttackToDead = false;
-
-        createEnemys();
-    }
-
     void Start()
     {
         GM = this.GetComponent<GameManager>();
-        hero1 = new Hero();
-        hero1.setJsonToHero(GM.JSONO.GetField("job")[0]);
-        hero1.GameObject = GameObject.Find("Canvas").transform.Find("Panel_Fight/HeroList/Hero1").gameObject;
-        bindInfo();
-        updateInfo();
         Text_Item = GameObject.Find("Canvas").transform.Find("Panel_Fight/Text_Item").GetComponent<Text>();
-        updateItem();
     }
 
     Button btn;
@@ -113,6 +72,45 @@ public class BattleManager : MonoBehaviour
             hertBlink(beHurtGameObject, isAttackToDead, deadID);
         }
     }
+
+    public void init()
+    {
+        bindInfo();
+        updateInfo();
+        updateItem();
+
+        wave = 0;
+        heroList = new List<Hero>();
+        enemyList = new List<Enemy>();
+        inAct = false;
+        isEnd = false;
+        actorID = 0;
+        currentActorIndex = 0;
+        ActorList = new List<ActItem>();
+
+        for (int i = 0; i < GM.player.heroList.Count; i++)
+        {
+            ActorList.Add(GM.player.heroList[i] as ActItem);
+            actorID++;
+            heroList.Add(GM.player.heroList[i]);
+        }
+
+        leftWave = GameObject.Find("Canvas").transform.Find("Panel_Fight/Text_leftWave").GetComponent<Text>();
+        backToVillageButton = GameObject.Find("Canvas").transform.Find("Panel_Fight/Button_Win").gameObject;
+        backToVillageButton.SetActive(false);
+        gameOverButton = GameObject.Find("Canvas").transform.Find("Panel_Fight/Button_GameOver").gameObject;
+        gameOverButton.SetActive(false);
+
+        EnemyListRT = GameObject.Find("Canvas").transform.Find("Panel_Fight/EnemyList").GetComponent<RectTransform>();
+
+        actTimer = 2f;
+        everyActTime = 0.5f;
+
+        isAttackToDead = false;
+        createHeros();
+        createEnemys();
+    }
+
     #region 进行一个回合
     float moveDistance = 20f;
     public void turnBase()
@@ -153,14 +151,16 @@ public class BattleManager : MonoBehaviour
                     {
                         isAttackToDead = true;
                         deadID = defencer;
-                        heroList[attacker].exp += enemyList[defencer].exp;
+                        for (int j = 0; j < heroList.Count; j++)
+                        {
+                            heroList[j].exp += enemyList[defencer].exp;
+                            heroList[j].checkLevelUp();
+                        }
                         Debug.Log("金币：" + enemyList[defencer].gold);
                         GM.player.gold += enemyList[defencer].gold;
                         Debug.Log("角色等级：" + heroList[attacker].level);
                         Debug.Log("角色经验：" + heroList[attacker].exp);
                         Debug.Log("角色攻击：" + heroList[attacker].str);
-                        //升级检测
-                        heroList[attacker].checkLevelUp();
                     }
                 }
                 else
@@ -303,7 +303,6 @@ public class BattleManager : MonoBehaviour
         {
             backToVillageButton.SetActive(true);
             isEnd = true;
-            hero1.SaveData();
             return;
         }
         leftWave.text = "第 " + (wave + 1).ToString() + " 波 / 共 " + enemys.Length + " 波";
@@ -336,6 +335,28 @@ public class BattleManager : MonoBehaviour
         fillHP();
     }
 
+    Transform heroListContainer;
+    void createHeros()
+    {
+        heroListContainer = GameObject.Find("Canvas").transform.Find("Panel_Fight/HeroList");
+        for (int i = 0; i < heroListContainer.childCount; i++)
+        {
+            GameObject.Destroy(heroListContainer.GetChild(i).gameObject);
+        }
+        for (int i = 0; i < GM.player.heroList.Count; i++)
+        {
+            Transform hero = Instantiate(Resources.Load<GameObject>("Prefabs/Hero")).transform;
+            hero.SetParent(heroListContainer);
+            if (i != 0)
+            {
+                string png = "";
+                GM.JSONO.GetField("job")[i-1].GetField(ref png, "png");
+                hero.Find("Image").GetComponent<Image>().sprite = Resources.Load<Sprite>(png);
+            }
+            GM.player.heroList[i].GameObject = hero.gameObject;
+        }
+    }
+    Transform infoPanel;
     Text Text_LV;
     Slider Slider_LV;
     Text Text_HP;
@@ -344,43 +365,56 @@ public class BattleManager : MonoBehaviour
     Slider Slider_MP;
     void bindInfo()
     {
-        Transform info = GameObject.Find("Canvas").transform.Find("Panel_Fight/Panel_Info");
-        Text_LV = info.Find("Text_LV").GetComponent<Text>();
-        Slider_LV = info.Find("Slider_LV").GetComponent<Slider>();
-        Text_HP = info.Find("Text_HP").GetComponent<Text>();
-        Slider_HP = info.Find("Slider_HP").GetComponent<Slider>();
-        Text_MP = info.Find("Text_MP").GetComponent<Text>();
-        Slider_MP = info.Find("Slider_MP").GetComponent<Slider>();
+        infoPanel = GameObject.Find("Canvas").transform.Find("Panel_Fight/HeroListInfo");
+        for (int i = 0; i < infoPanel.childCount; i++)
+        {
+            GameObject.Destroy(infoPanel.GetChild(i).gameObject);
+        }
+        for (int i = 0; i < GM.player.heroList.Count; i++)
+        {
+            Transform heroInfo = Instantiate(Resources.Load<GameObject>("Prefabs/HeroInfo")).transform;
+            heroInfo.SetParent(infoPanel, false);
+        }
     }
     void updateInfo()
     {
-        float nextLvExp = Mathf.Round(Mathf.Pow((hero1.level), 0.4f) * Mathf.Pow(hero1.level, 2) * 5);
-        Text_LV.text = "Lv：" + hero1.level.ToString();
-        if (hero1.level != 0)
+        for (int i = 0; i < GM.player.heroList.Count; i++)
         {
-            Slider_LV.value = hero1.exp / nextLvExp;
-        }
-        else
-        {
-            Slider_LV.value = 0;
-        }
-        Text_HP.text = "HP：" + hero1.HP + "/" + hero1.HPMax;
-        if (hero1.HP != 0)
-        {
-            Slider_HP.value = (float)hero1.HP / hero1.HPMax;
-        }
-        else
-        {
-            Slider_HP.value = 0;
-        }
-        Text_MP.text = "MP：" + hero1.MP + "/" + hero1.MPMax;
-        if (hero1.MPMax != 0)
-        {
-            Slider_MP.value = (float)hero1.MP / hero1.MPMax;
-        }
-        else
-        {
-            Slider_MP.value = 0;
+            Text_LV = infoPanel.GetChild(i).Find("Text_LV").GetComponent<Text>();
+            Slider_LV = infoPanel.GetChild(i).Find("Slider_LV").GetComponent<Slider>();
+            Text_HP = infoPanel.GetChild(i).Find("Text_HP").GetComponent<Text>();
+            Slider_HP = infoPanel.GetChild(i).Find("Slider_HP").GetComponent<Slider>();
+            Text_MP = infoPanel.GetChild(i).Find("Text_MP").GetComponent<Text>();
+            Slider_MP = infoPanel.GetChild(i).Find("Slider_MP").GetComponent<Slider>();
+
+            float nextLvExp = Mathf.Round(Mathf.Pow((GM.player.heroList[i].level), 0.4f) * Mathf.Pow(GM.player.heroList[i].level, 2) * 5);
+            Text_LV.text = "Lv：" + GM.player.heroList[i].level.ToString();
+            if (GM.player.heroList[i].level != 0)
+            {
+                Slider_LV.value = GM.player.heroList[i].exp / nextLvExp;
+            }
+            else
+            {
+                Slider_LV.value = 0;
+            }
+            Text_HP.text = "HP：" + GM.player.heroList[i].HP + "/" + GM.player.heroList[i].HPMax;
+            if (GM.player.heroList[i].HP != 0)
+            {
+                Slider_HP.value = (float)GM.player.heroList[i].HP / GM.player.heroList[i].HPMax;
+            }
+            else
+            {
+                Slider_HP.value = 0;
+            }
+            Text_MP.text = "MP：" + GM.player.heroList[i].MP + "/" + GM.player.heroList[i].MPMax;
+            if (GM.player.heroList[i].MPMax != 0)
+            {
+                Slider_MP.value = (float)GM.player.heroList[i].MP / GM.player.heroList[i].MPMax;
+            }
+            else
+            {
+                Slider_MP.value = 0;
+            }
         }
     }
 

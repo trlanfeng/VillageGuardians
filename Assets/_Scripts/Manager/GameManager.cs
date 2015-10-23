@@ -88,6 +88,11 @@ public class GameManager : MonoBehaviour
             }
         }
 
+        if (player.heroList.Count == 0)
+        {
+            player.heroList.Add(new Hero(Hero.Job.Hero));
+        }
+
         createItemList();
         createEquipmentList();
         createMagicList();
@@ -240,6 +245,18 @@ public class GameManager : MonoBehaviour
             case ItemType.Magic:
                 break;
             case ItemType.Job:
+                if (player.heroList.Count < 4)
+                {
+                    int price = 0;
+                    JSONO.GetField("job")[index].GetField(ref price, "gold");
+                    if (player.gold >= price)
+                    {
+                        player.heroList.Add(new Hero((Hero.Job)index));
+                        player.gold -= price;
+                        Text_Gold.text = player.gold + " G";
+                        GDM.SaveAutoData();
+                    }
+                }
                 break;
             default:
                 break;
@@ -392,6 +409,12 @@ public class GameManager : MonoBehaviour
             newItem.transform.SetParent(dataList.transform);
             newItem.transform.localScale = new Vector3(1, 1, 1);
             newItem.name = "job" + i.ToString();
+            Button btn = newItem.GetComponent<Button>();
+            int index = i;
+            btn.onClick.AddListener(() =>
+            {
+                buy(ItemType.Job, index);
+            });
             JSONO.GetField("job")[i].GetField(ref name, "name");
             JSONO.GetField("job")[i].GetField(ref png, "png");
             JSONO.GetField("job")[i].GetField(ref gold, "gold");
@@ -630,9 +653,9 @@ public class GameManager : MonoBehaviour
     public void beginFight()
     {
         generateEnemyList(level);
+        BM.init();
         Village.SetActive(false);
         Fight.SetActive(true);
-        BM.init();
         GDM.SaveAutoData();
     }
     public void backToVillage()

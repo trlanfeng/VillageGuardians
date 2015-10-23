@@ -2,8 +2,16 @@
 using System.Collections;
 public class Hero : ActItem
 {
+    public enum Job
+    {
+        Hero,
+        Warrior,
+        Witch
+    }
+
     public string name;
     public string png;
+    public Job job;
     public int level;
     public int exp;
     public int HPMax;
@@ -21,8 +29,10 @@ public class Hero : ActItem
     public int weaponID;
     public int armorID;
 
-    public Hero()
+    public Hero(Job j)
     {
+        job = j;
+
         base.ActorType = 1;
         level = 1;
         exp = 0;
@@ -41,13 +51,34 @@ public class Hero : ActItem
         baseMag = 1;
         baseDef = 1;
 
+        TextAsset dataFile = Resources.Load("dataFile") as TextAsset;
+        dataJSON = dataFile.text;
+        JSONO = new JSONObject(dataJSON);
+        switch (j)
+        {
+            case Job.Hero:
+                setJsonToHero(JSONO.GetField("job")[0]);
+                break;
+            case Job.Warrior:
+                setJsonToHero(JSONO.GetField("job")[0]);
+                break;
+            case Job.Witch:
+                setJsonToHero(JSONO.GetField("job")[1]);
+                break;
+        }
+
         LoadData();
 
         checkLevelUp();
     }
 
+    //定义JSON Object变量
+    public JSONObject JSONO;
+    private string dataJSON;
+
     public void setJsonToHero(JSONObject jo)
     {
+        
         jo.GetField(ref baseHP, "baseHP");
         jo.GetField(ref baseMP, "baseMP");
         jo.GetField(ref baseStr, "baseStr");

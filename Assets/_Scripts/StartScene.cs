@@ -15,12 +15,12 @@ public class StartScene : MonoBehaviour {
 
     public void StartGame()
     {
-        SceneManager.LoadScene("Game", false);
+        Application.LoadLevel("Game");
     }
 
     public void ContinueGame()
     {
         PlayerPrefs.SetInt("load", 1);
-        SceneManager.LoadScene("Game", false);
+        Application.LoadLevel("Game");
     }
 }

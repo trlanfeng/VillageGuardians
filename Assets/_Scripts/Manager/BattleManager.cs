@@ -178,7 +178,30 @@ public class BattleManager : MonoBehaviour
             beHurtGameObject = heroList[i].GameObject;
             moveDistance = Mathf.Abs(moveDistance) * -1;
             Debug.Log("执行了一次攻击！");
-            int beHurtHP = enemyList[attacker].str - heroList[defencer].def;
+            int beHurtHP = 0;
+            //加入怪物命中率
+            float hitRate = Random.Range(0f, 1f);
+            if (GM.level < 5)
+            {
+                if (hitRate > 0.5f)
+                {
+                    beHurtHP = enemyList[attacker].str - heroList[defencer].def;
+                }
+            }
+            else if (GM.level >= 5 && GM.level < 15)
+            {
+                if (hitRate > 0.3f)
+                {
+                    beHurtHP = enemyList[attacker].str - heroList[defencer].def;
+                }
+            }
+            else
+            {
+                if (hitRate > 0.1f)
+                {
+                    beHurtHP = enemyList[attacker].str - heroList[defencer].def;
+                }
+            }
             if (beHurtHP > 0)
             {
                 heroList[defencer].HP = heroList[defencer].HP - beHurtHP;

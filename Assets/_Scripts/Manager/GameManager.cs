@@ -670,6 +670,6 @@ public class GameManager : MonoBehaviour
 
     public void GameOver()
     {
-        SceneManager.LoadScene("Start", false);
+        Application.LoadLevel("Start");
     }
 }

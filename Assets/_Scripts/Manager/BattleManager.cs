@@ -145,6 +145,7 @@ public class BattleManager : MonoBehaviour
                 }
                 if (beHurtHP > 0)
                 {
+                    flyText(enemyList[defencer].GameObject.transform.position, new Color(1, 0, 0, 1), "-" + beHurtHP);
                     enemyList[defencer].HP = enemyList[defencer].HP - beHurtHP;
                     Debug.Log("被攻击者的生命：" + enemyList[defencer].HP);
                     if (enemyList[defencer].HP <= 0)
@@ -165,6 +166,7 @@ public class BattleManager : MonoBehaviour
                 }
                 else
                 {
+                    flyText(enemyList[defencer].GameObject.transform.position, new Color(1, 1, 1, 1), "闪避");
                     Debug.Log("未破防");
                 }
             }
@@ -204,6 +206,7 @@ public class BattleManager : MonoBehaviour
             }
             if (beHurtHP > 0)
             {
+                flyText(heroList[defencer].GameObject.transform.position, new Color(1, 0, 0, 1), "-" + beHurtHP);
                 heroList[defencer].HP = heroList[defencer].HP - beHurtHP;
                 if (heroList[defencer].HP <= 0)
                 {
@@ -216,6 +219,7 @@ public class BattleManager : MonoBehaviour
             }
             else
             {
+                flyText(heroList[defencer].GameObject.transform.position, new Color(0, 1, 0, 1), "闪避");
                 Debug.Log("未破防");
             }
         }
@@ -510,6 +514,7 @@ public class BattleManager : MonoBehaviour
             if (GM.player.itemCount[0] > 0)
             {
                 heroList[currentActorIndex].HP += 10;
+                flyText(heroList[currentActorIndex].GameObject.transform.position, new Color(0, 1, 0, 1), "+" + 10);
                 GM.player.itemCount[0] -= 1;
             }
         }
@@ -518,6 +523,7 @@ public class BattleManager : MonoBehaviour
             if (GM.player.itemCount[1] > 0)
             {
                 heroList[currentActorIndex].HP += 30;
+                flyText(heroList[currentActorIndex].GameObject.transform.position, new Color(0, 1, 0, 1), "+" + 30);
                 GM.player.itemCount[1] -= 1;
             }
         }
@@ -526,6 +532,7 @@ public class BattleManager : MonoBehaviour
             if (GM.player.itemCount[2] > 0)
             {
                 heroList[currentActorIndex].HP += 100;
+                flyText(heroList[currentActorIndex].GameObject.transform.position, new Color(0, 1, 0, 1), "+" + 100);
                 GM.player.itemCount[2] -= 1;
             }
         }
@@ -534,6 +541,7 @@ public class BattleManager : MonoBehaviour
             if (GM.player.itemCount[3] > 0)
             {
                 heroList[currentActorIndex].HP += 500;
+                flyText(heroList[currentActorIndex].GameObject.transform.position, new Color(0, 1, 0, 1), "+" + 500);
                 GM.player.itemCount[3] -= 1;
             }
         }
@@ -600,5 +608,14 @@ public class BattleManager : MonoBehaviour
             }
             lostHP = heroList[currentActorIndex].HPMax - heroList[currentActorIndex].HP;
         }
+    }
+
+    void flyText(Vector3 pos,Color color,string content)
+    {
+        GameObject go = Instantiate(Resources.Load<GameObject>("Prefabs/Text_FlyText"), pos, Quaternion.identity) as GameObject;
+        go.transform.SetParent(GameObject.Find("Canvas").transform);
+        FlyText ft = go.GetComponent<FlyText>();
+        ft.color = color;
+        ft.content = content;
     }
 }

@@ -2,14 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
     public Player player;
 
+    public enum GameState
+    {
+        Village,
+        Battle
+    }
+
     BattleManager BM;
     GameDataManager GDM;
+
+
 
     //获取各组件的 RectTransform 方便进行设置
     public RectTransform PanelList;
@@ -670,6 +679,6 @@ public class GameManager : MonoBehaviour
 
     public void GameOver()
     {
-        Application.LoadLevel("Start");
+        SceneManager.LoadScene("Start");
     }
 }

@@ -1,26 +1,17 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
 
 public class StartScene : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
-
     public void StartGame()
     {
-        Application.LoadLevel("Game");
+        SceneManager.LoadScene("Game");
     }
 
     public void ContinueGame()
     {
         PlayerPrefs.SetInt("load", 1);
-        Application.LoadLevel("Game");
+        SceneManager.LoadScene("Game");
     }
 }

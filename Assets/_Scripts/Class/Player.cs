@@ -8,5 +8,4 @@ public class Player
     public int bagSize = 20;
     public int[] itemCount = new int[5];
     public List<Hero> heroList = new List<Hero>();
-
 }

@@ -4,68 +4,61 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
-
 public class GameManager : MonoBehaviour
 {
     public Player player;
-
+    /// <summary>
+    /// 游戏状态，共有两种，1.村庄中；2.战斗中
+    /// </summary>
     public enum GameState
     {
         Village,
         Battle
     }
-
     BattleManager BM;
     GameDataManager GDM;
-
-
-
-    //获取各组件的 RectTransform 方便进行设置
+    /// <summary>
+    /// 公用的列表项，不同状态加载不同列表
+    /// </summary>
     public RectTransform PanelList;
-
     public RectTransform PanelListContainer;
     public RectTransform PanelListViewer;
+    /// <summary>
+    /// 列表项的返回按钮
+    /// </summary>
     public RectTransform ButtonBack;
-
-    //获取用于生成列表的 Prefab
+    /// <summary>
+    /// 获取用于生成列表的 Prefab
+    /// </summary>
     public GameObject ListItem;
-
-    //获取滚动条，当数量小于6时不显示，反之
+    /// <summary>
+    /// 获取滚动条，当数量小于6时不显示，反之
+    /// </summary>
     public GameObject PanelListScrollbar;
-
     //获取 Menu 面板和 List 面板，用于切换动画
     public RectTransform PanelMenu;
-
     //定义JSON Object变量
     public JSONObject JSONO;
     private string dataJSON;
-
     //当前列表
     private GameObject[] currentDataList;
-
     //存储位置
     public GameObject dataList;
-
     public GameObject showList;
-
     //定义存储
     private Item[] itemList;
     private GameObject[] equipmentList;
     private GameObject[] magicList;
     private GameObject[] jobList;
     private GameObject[] enemyList;
-
     private Vector2 leftPosition = new Vector2(-480f, -65f);
     private Vector2 centerPosition = new Vector2(0, -65f);
     private Vector2 rightPosition = new Vector2(480f, -65f);
-
     public GameObject Village;
     public GameObject Fight;
     public GameObject Canvas;
-
     Text Text_Gold;
     Text Text_Day;
-
     enum ItemType
     {
         Item,
@@ -73,10 +66,8 @@ public class GameManager : MonoBehaviour
         Magic,
         Job
     }
-
     public int level;
     public int[][] enemyIDList;
-
     private void Awake()
     {
         level = 0;
@@ -86,7 +77,6 @@ public class GameManager : MonoBehaviour
         TextAsset dataFile = Resources.Load("dataFile") as TextAsset;
         dataJSON = dataFile.text;
         JSONO = new JSONObject(dataJSON);
-
         if (PlayerPrefs.HasKey("load"))
         {
             if (PlayerPrefs.GetInt("load") == 1)
@@ -96,12 +86,10 @@ public class GameManager : MonoBehaviour
                 GDM.LoadAutoData();
             }
         }
-
         if (player.heroList.Count == 0)
         {
             player.heroList.Add(new Hero(Hero.Job.Hero));
         }
-
         createItemList();
         createEquipmentList();
         createMagicList();
@@ -113,30 +101,24 @@ public class GameManager : MonoBehaviour
         Fight.SetActive(false);
         Text_Gold = Village.transform.Find("TopBanner/Text_Gold").GetComponent<Text>();
         Text_Gold.text = player.gold + " G";
-
         Text_Day = Village.transform.Find("TopBanner/Text_Day").GetComponent<Text>();
         Text_Day.text = "第 " + (level + 1).ToString() + " 天";
-
         generateEnemyList(level);
     }
-
     private void Start()
     {
         //currentDataList = getList("item");
         //addItemToList(currentDataList);
     }
-
     private void Update()
     {
     }
-
     //创建列表项
     public void CreateItem()
     {
         Transform newItem = Instantiate(ListItem).transform;
         newItem.SetParent(PanelListContainer);
     }
-
     //打开列表
     public void openList(string type = "")
     {
@@ -169,7 +151,6 @@ public class GameManager : MonoBehaviour
         DOTween.To(() => PanelMenu.anchoredPosition, x => PanelMenu.anchoredPosition = x, leftPosition, 0.2f);
         DOTween.To(() => PanelList.anchoredPosition, x => PanelList.anchoredPosition = x, centerPosition, 0.2f);
     }
-
     /// <summary>
     /// 关闭列表
     /// </summary>
@@ -180,7 +161,6 @@ public class GameManager : MonoBehaviour
         DOTween.To(() => PanelMenu.anchoredPosition, x => PanelMenu.anchoredPosition = x, centerPosition, 0.2f);
         DOTween.To(() => PanelList.anchoredPosition, x => PanelList.anchoredPosition = x, rightPosition, 0.2f);
     }
-
     /// <summary>
     /// 得到 item 列表
     /// </summary>
@@ -220,7 +200,6 @@ public class GameManager : MonoBehaviour
             itemList[i] = item;
         }
     }
-
     private void buy(ItemType it, int index)
     {
         switch (it)
@@ -271,9 +250,7 @@ public class GameManager : MonoBehaviour
                 break;
         }
     }
-
     #region 获取 weapon 和 armor 列表
-
     /// <summary>
     /// 获取 weapon 和 armor 列表
     /// </summary>
@@ -345,11 +322,8 @@ public class GameManager : MonoBehaviour
             equipmentList[i + x] = newItem;
         }
     }
-
     #endregion 获取 weapon 和 armor 列表
-
     #region 得到 Magic 列表
-
     /// <summary>
     /// 得到 Magic 列表
     /// </summary>
@@ -392,11 +366,8 @@ public class GameManager : MonoBehaviour
             magicList[i] = newItem;
         }
     }
-
     #endregion 得到 Magic 列表
-
     #region 得到 Job 列表
-
     /// <summary>
     /// 得到 Job 列表
     /// </summary>
@@ -445,9 +416,7 @@ public class GameManager : MonoBehaviour
             jobList[i] = newItem;
         }
     }
-
     #endregion 得到 Job 列表
-
     /// <summary>
     /// 得到 Enemy 列表
     /// </summary>
@@ -478,9 +447,7 @@ public class GameManager : MonoBehaviour
             enemyList[i] = newItem;
         }
     }
-
     public List<GameObject> enemyListGameObject;
-
     /// <summary>
     /// 生成怪物列表
     /// </summary>
@@ -580,7 +547,6 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-
     /// <summary>
     /// 获取列表
     /// </summary>
@@ -598,7 +564,6 @@ public class GameManager : MonoBehaviour
                     addItemToList(item.GameObject);
                 }
                 break;
-
             case "equipment":
                 if (equipmentList == null)
                 {
@@ -606,7 +571,6 @@ public class GameManager : MonoBehaviour
                 }
                 addItemToList(equipmentList);
                 break;
-
             case "magic":
                 if (magicList == null)
                 {
@@ -614,7 +578,6 @@ public class GameManager : MonoBehaviour
                 }
                 addItemToList(magicList);
                 break;
-
             case "job":
                 if (jobList == null)
                 {
@@ -622,19 +585,16 @@ public class GameManager : MonoBehaviour
                 }
                 addItemToList(jobList);
                 break;
-
             case "enemy":
                 if (enemyList == null)
                 {
                     createEnemyList();
                 }
                 break;
-
             default:
                 break;
         }
     }
-
     /// <summary>
     /// 将得到的列表添加进入UI中
     /// </summary>
@@ -650,7 +610,6 @@ public class GameManager : MonoBehaviour
     {
         go.transform.SetParent(showList.transform, false);
     }
-
     public void removeItemToData()
     {
         while (showList.transform.childCount > 0)
@@ -658,7 +617,6 @@ public class GameManager : MonoBehaviour
             showList.transform.GetChild(0).SetParent(dataList.transform);
         }
     }
-
     public void beginFight()
     {
         generateEnemyList(level);
@@ -676,7 +634,6 @@ public class GameManager : MonoBehaviour
         Text_Day.text = "第 " + (level + 1).ToString() + " 天";
         GDM.SaveAutoData();
     }
-
     public void GameOver()
     {
         SceneManager.LoadScene("Start");

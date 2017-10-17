@@ -1,4 +1,4 @@
-#Village Guardians
+# Village Guardians
 
 本项目基于GPL v2协议开源。
 
@@ -9,3 +9,5 @@
 项目介绍：
 
 基于Unity 5开发，C#脚本，UI部分使用uGUI。本游戏是一款半自动是防守游戏，简单回合制战斗。
+
+## 没想到上了码云周刊，吓得我准备更新一下了。自学unity时候写的，当时渣水平，找到unity工作后就没管过了。
